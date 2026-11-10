@@ -305,7 +305,52 @@
             </div>
         </div>
 
-        <!-- 4. KẾT NỐI TIKTOK LIVE THẬT -->
+        <!-- 4. TEST ÂM THANH SOLO LEVELING (11 SFX SOUNDBOARD) -->
+        <div class="card" style="border: 1.5px solid #8b5cf6; background: #110e20;">
+            <div class="card-title" style="color: #c084fc;">
+                <span>🎵 Bảng Test Âm Thanh Solo Leveling (11 SFX Chân Thực)</span>
+            </div>
+            <div style="font-size: 12px; color: #94a3b8; margin-bottom: 10px;">
+                💡 Bấm các nút dưới đây để kiểm tra âm thanh phát trực tiếp trên màn hình game OBS:
+            </div>
+            <div class="btn-grid">
+                <button class="btn-tap" onclick="testSound('slash_normal')" style="background: #1e293b; border-color: #64748b;">
+                    🗡️ Chém Thường
+                </button>
+                <button class="btn-tap" onclick="testSound('slash_heavy')" style="background: #334155; border-color: #94a3b8;">
+                    ⚔️ Chém Chí Mạng
+                </button>
+                <button class="btn-tap" onclick="testSound('level_up')" style="background: #065f46; border-color: #10b981;">
+                    ✨ Lên Cấp Thợ Săn
+                </button>
+                <button class="btn-vip" onclick="testSound('rank_up')" style="background: #b45309; border-color: #f59e0b;">
+                    🎖️ Thăng Hạng Rank
+                </button>
+                <button class="btn-danger" onclick="testSound('boss_charge')" style="background: #991b1b; border-color: #ef4444;">
+                    🚨 Báo Động Tụ Chiêu
+                </button>
+                <button class="btn-danger" onclick="testSound('boss_attack')" style="background: #7f1d1d; border-color: #dc2626;">
+                    🦁 Quái Gầm & Đánh Trả
+                </button>
+                <button class="btn-vip" onclick="testSound('shield_break')" style="background: #0284c7; border-color: #38bdf8;">
+                    🛡️ Phá Giáp Choáng
+                </button>
+                <button class="btn-arise" onclick="testSound('arise')">
+                    👑 ARISE! Trỗi Dậy
+                </button>
+                <button class="btn-vip" onclick="testSound('victory')" style="background: #854d0e; border-color: #eab308;">
+                    🏆 Chiến Thắng Diệt Boss
+                </button>
+                <button class="btn-danger" onclick="testSound('dungeon_collapse')" style="background: #450a0a; border-color: #991b1b;">
+                    💥 Hầm Ngục Sụp Đổ
+                </button>
+                <button class="btn-gate" onclick="testSound('timer_tick')" style="background: #374151; border-color: #6b7280;">
+                    ⏱️ Tích Tắc Hết Giờ
+                </button>
+            </div>
+        </div>
+
+        <!-- 5. KẾT NỐI TIKTOK LIVE THẬT -->
         <div class="card" style="border: 1.5px solid #fe2c55;">
             <div class="card-title">
                 <span>📡 Kết Nối TikTok Live Thật (Miễn Phí 100%)</span>
@@ -550,6 +595,11 @@
 
         function resetBossHp() {
             socket.emit('admin_reset_boss');
+        }
+
+        function testSound(soundName) {
+            socket.emit('admin_play_sound', soundName);
+            addLog(`🔊 Đã phát hiệu ứng âm thanh: [${soundName}]`, '#c084fc');
         }
 
         function switchServerUrl() {

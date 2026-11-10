@@ -2,15 +2,20 @@
 const socket = io();
 
 // ==========================================
-// 1. ÂM THANH GAME (HYBRID WEB AUDIO + SFX)
+// 1. ÂM THANH GAME CHUẨN SOLO LEVELING SFX
 // ==========================================
 const SOUND_FILES = {
-    coin: '/assets/sounds/coin.wav',
-    fanfare: '/assets/sounds/fanfare.wav',
-    thunder: '/assets/sounds/thunder.wav',
-    join: '/assets/sounds/join.wav',
-    arise_voice: '/assets/sounds/steal_1.wav',
-    victory: '/assets/sounds/success_8386.wav'
+    slash_normal: '/assets/sounds/slash_normal.wav',
+    slash_heavy: '/assets/sounds/slash_heavy.wav',
+    level_up: '/assets/sounds/level_up.wav',
+    rank_up: '/assets/sounds/rank_up.wav',
+    boss_attack: '/assets/sounds/boss_roar_attack.wav',
+    boss_charge: '/assets/sounds/boss_charge_alarm.wav',
+    shield_break: '/assets/sounds/shield_break.wav',
+    arise: '/assets/sounds/arise_summon.wav',
+    dungeon_collapse: '/assets/sounds/dungeon_collapse.wav',
+    victory: '/assets/sounds/victory_fanfare.wav',
+    timer_tick: '/assets/sounds/timer_tick.wav'
 };
 
 const audioCache = {};
@@ -24,37 +29,14 @@ function playSound(key) {
     try {
         if (audioCache[key]) {
             const clone = audioCache[key].cloneNode();
-            clone.volume = 0.85;
+            clone.volume = 0.95;
             clone.play().catch(() => {});
         }
     } catch (e) {}
 }
 
-// Bộ tạo âm thanh chém kiếm Web Audio cho tốc độ phản hồi cực nhạy
-const AudioCtx = window.AudioContext || window.webkitAudioContext;
-let sfxCtx = null;
-
 function playSlashSound(isCrit = false) {
-    try {
-        if (!sfxCtx) sfxCtx = new AudioCtx();
-        if (sfxCtx.state === 'suspended') sfxCtx.resume();
-
-        const osc = sfxCtx.createOscillator();
-        const gain = sfxCtx.createGain();
-
-        osc.type = isCrit ? 'sawtooth' : 'triangle';
-        osc.frequency.setValueAtTime(isCrit ? 800 : 450, sfxCtx.currentTime);
-        osc.frequency.exponentialRampToValueAtTime(80, sfxCtx.currentTime + 0.08);
-
-        gain.gain.setValueAtTime(isCrit ? 0.25 : 0.12, sfxCtx.currentTime);
-        gain.gain.exponentialRampToValueAtTime(0.01, sfxCtx.currentTime + 0.08);
-
-        osc.connect(gain);
-        gain.connect(sfxCtx.destination);
-
-        osc.start();
-        osc.stop(sfxCtx.currentTime + 0.09);
-    } catch (e) {}
+    playSound(isCrit ? 'slash_heavy' : 'slash_normal');
 }
 
 // ==========================================
@@ -402,6 +384,9 @@ socket.on('dungeon_timer_tick', (data) => {
     if (dungeonTimerBox) {
         if (data.isWarning) {
             dungeonTimerBox.classList.add('timer-warning');
+            if (data.remaining <= 15 && data.remaining > 0) {
+                playSound('timer_tick');
+            }
         } else {
             dungeonTimerBox.classList.remove('timer-warning');
         }
@@ -410,7 +395,7 @@ socket.on('dungeon_timer_tick', (data) => {
 
 // Thăng cấp thất bại khi hết giờ
 socket.on('dungeon_failed', (data) => {
-    playSound('thunder');
+    playSound('dungeon_collapse');
     if (defeatBanner) defeatBanner.classList.remove('hidden');
     if (bossContainer) {
         bossContainer.classList.remove('boss-charging', 'boss-counter-attack');
@@ -430,7 +415,7 @@ socket.on('stage_retried', (data) => {
     if (bossContainer) bossContainer.style.filter = '';
     updateStageInfo(data.stage, data.bossCurrentHp, data.bossMaxHp);
     renderLeaderboards(data.topDps, data.topDonators);
-    playSound('fanfare');
+    playSound('rank_up');
 });
 
 // Cập nhật Nộ khí & Khiên bảo vệ
@@ -453,7 +438,7 @@ socket.on('boss_charging_started', (data) => {
         if (chargeBreakFill) chargeBreakFill.style.width = '100%';
         if (chargeTimerNum) chargeTimerNum.innerText = data.countdown + 's';
     }
-    playSound('thunder');
+    playSound('boss_charge');
 });
 
 // Đếm ngược tụ chiêu
@@ -466,7 +451,7 @@ socket.on('boss_charge_tick', (data) => {
 socket.on('charge_hits_updated', (data) => {
     if (chargeHitsText) chargeHitsText.innerText = `${data.remaining} HITS (Hoặc 1 Quà)`;
     if (chargeBreakFill) chargeBreakFill.style.width = data.pct + '%';
-    playSlashSound(true);
+    playSound('slash_heavy');
 });
 
 // QUÁI ĐÁNH TRẢ (COUNTER-ATTACK)
@@ -513,8 +498,7 @@ socket.on('boss_attack_triggered', (data) => {
         addSlashParticle(cx, cy, '#ff0033');
     }
 
-    playSound('thunder');
-    playSlashSound(true);
+    playSound('boss_attack');
     updateRageAndShield(0, data.hunterShield);
 
     setTimeout(() => {
@@ -533,7 +517,7 @@ socket.on('boss_stunned', (data) => {
     }
     if (bossStunStars) bossStunStars.classList.remove('hidden');
 
-    playSound('fanfare');
+    playSound('shield_break');
     updateRageAndShield(0, undefined);
 
     const breakerName = data.breaker ? `@${data.breaker.nickname}` : 'TỔ ĐỘI';
@@ -550,15 +534,21 @@ socket.on('boss_damaged', (data) => {
     updateHpBar(data.bossCurrentHp, data.bossMaxHp);
     flashBossHit();
 
+    // Âm thanh LÊN CẤP / THĂNG HẠNG THỢ SĂN (Level Up / Rank Up)
+    if (data.isRankUp) {
+        const isGodOrS = (data.player.rank === 'QUỐC GIA' || data.player.rank === 'S');
+        playSound(isGodOrS ? 'rank_up' : 'level_up');
+    }
+
     let type = 'normal';
     if (data.actionType === 'gift') {
         type = (data.giftName && data.giftName.includes('Hạc')) ? 'arise' : 'crit';
-        playSound(data.damage >= 100000 ? 'thunder' : 'coin');
+        playSound(data.damage >= 100000 ? 'arise' : 'slash_heavy');
         if (data.giftName) {
             enqueueToast(data.player, data.giftName, data.giftIcon, data.giftDiamonds || 1);
         }
     } else {
-        playSlashSound(Math.random() > 0.7);
+        playSound(Math.random() > 0.6 ? 'slash_heavy' : 'slash_normal');
     }
 
     spawnDamageNumber(data.damage, type, data.player.nickname);
@@ -571,8 +561,7 @@ socket.on('leaderboard_updated', (data) => {
 
 // Sự kiện ARISE (TRỖI DẬY) 99+ xu
 socket.on('arise_activated', (data) => {
-    playSound('arise_voice');
-    setTimeout(() => playSound('thunder'), 300);
+    playSound('arise');
 
     const heroImg = document.getElementById('arise-hero-avatar');
     const heroName = document.getElementById('arise-hero-name');
@@ -604,7 +593,7 @@ socket.on('new_stage_started', (data) => {
     victoryBanner.classList.add('hidden');
     updateStageInfo(data.stage, data.bossCurrentHp, data.bossMaxHp);
     renderLeaderboards(data.topDps, data.topDonators);
-    playSound('fanfare');
+    playSound('rank_up');
 });
 
 socket.on('boss_reset', (data) => {
