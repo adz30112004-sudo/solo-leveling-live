@@ -25,14 +25,48 @@ for (const [key, path] of Object.entries(SOUND_FILES)) {
     audioCache[key] = a;
 }
 
+// Mở khoá Audio Context & chính sách Autoplay của trình duyệt khi click
+let audioUnlocked = false;
+function unlockGameAudio() {
+    if (audioUnlocked) return;
+    audioUnlocked = true;
+    for (const a of Object.values(audioCache)) {
+        a.play().then(() => {
+            a.pause();
+            a.currentTime = 0;
+        }).catch(() => {});
+    }
+    const banner = document.getElementById('audio-unlock-banner');
+    if (banner) banner.remove();
+}
+window.addEventListener('click', unlockGameAudio);
+window.addEventListener('touchstart', unlockGameAudio);
+window.addEventListener('keydown', unlockGameAudio);
+
 function playSound(key) {
     try {
         if (audioCache[key]) {
             const clone = audioCache[key].cloneNode();
             clone.volume = 0.95;
-            clone.play().catch(() => {});
+            const playPromise = clone.play();
+            if (playPromise !== undefined) {
+                playPromise.catch(() => {
+                    // Trình duyệt đang chặn autoplay, hiển thị nhắc nhở người dùng click
+                    showAudioUnlockBanner();
+                });
+            }
         }
     } catch (e) {}
+}
+
+function showAudioUnlockBanner() {
+    if (audioUnlocked || document.getElementById('audio-unlock-banner')) return;
+    const b = document.createElement('div');
+    b.id = 'audio-unlock-banner';
+    b.style.cssText = 'position:fixed;top:10px;left:50%;transform:translateX(-50%);background:linear-gradient(90deg,#ff0055,#8b5cf6);color:#fff;padding:8px 16px;border-radius:20px;font-size:12px;font-weight:800;z-index:99999;box-shadow:0 4px 15px rgba(0,0,0,0.5);cursor:pointer;animation:pulse 1s infinite;';
+    b.innerHTML = '🔊 Nhấn vào màn hình để bật âm thanh game';
+    b.onclick = unlockGameAudio;
+    document.body.appendChild(b);
 }
 
 function playSlashSound(isCrit = false) {

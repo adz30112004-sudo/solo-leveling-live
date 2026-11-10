@@ -593,13 +593,47 @@
             socket.emit('admin_switch_stage', idx);
         }
 
+        // ----------------------------------------------------
+        // CACHE ÂM THANH TRÊN ADMIN ĐỂ NGHE ĐƯỢC NGAY TẠI CHỖ
+        // ----------------------------------------------------
+        const ADMIN_SOUNDS = {
+            slash_normal: '/assets/sounds/slash_normal.wav',
+            slash_heavy: '/assets/sounds/slash_heavy.wav',
+            level_up: '/assets/sounds/level_up.wav',
+            rank_up: '/assets/sounds/rank_up.wav',
+            boss_charge: '/assets/sounds/boss_charge_alarm.wav',
+            boss_attack: '/assets/sounds/boss_roar_attack.wav',
+            shield_break: '/assets/sounds/shield_break.wav',
+            arise: '/assets/sounds/arise_summon.wav',
+            victory: '/assets/sounds/victory_fanfare.wav',
+            dungeon_collapse: '/assets/sounds/dungeon_collapse.wav',
+            timer_tick: '/assets/sounds/timer_tick.wav'
+        };
+        const adminAudioCache = {};
+        for (const [k, src] of Object.entries(ADMIN_SOUNDS)) {
+            adminAudioCache[k] = new Audio(src);
+            adminAudioCache[k].volume = 1.0;
+        }
+
         function resetBossHp() {
             socket.emit('admin_reset_boss');
         }
 
         function testSound(soundName) {
+            // 1. Phát âm thanh trực tiếp trên tab Admin (để streamer nghe thử ngay trên loa/tai nghe)
+            try {
+                if (adminAudioCache[soundName]) {
+                    const audioClone = adminAudioCache[soundName].cloneNode();
+                    audioClone.volume = 1.0;
+                    audioClone.play().catch(e => console.warn('Lỗi phát âm thanh cục bộ:', e));
+                }
+            } catch (err) {
+                console.warn(err);
+            }
+
+            // 2. Gửi tín hiệu sang màn hình Game Live (OBS/Browser Source) để phát cùng lúc
             socket.emit('admin_play_sound', soundName);
-            addLog(`🔊 Đã phát hiệu ứng âm thanh: [${soundName}]`, '#c084fc');
+            addLog(`🔊 Đang phát âm thanh: [${soundName}] (Nghe trực tiếp trên Admin + Game Live)`, '#c084fc');
         }
 
         function switchServerUrl() {
