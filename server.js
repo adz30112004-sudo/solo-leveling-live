@@ -80,18 +80,18 @@ const STAGES = [
     },
     {
         id: 'gate_god',
-        name: 'Cổng Thần: Hầm Ngục Kép',
+        name: 'Cổng Thần: Đền Thờ Cổ Đại',
         rank: 'QUỐC GIA',
-        bossName: 'Tượng Thần Cười Cổ Đại',
-        bossTitle: 'Kẻ Thống Trị Đền Thờ Cấm Kỵ',
-        bossImage: '/assets/boss_statue.png',
+        bossName: 'Long Vương Antares',
+        bossTitle: 'Hoàng Đế Hủy Diệt Cấp Quốc Gia',
+        bossImage: '/assets/boss_antares.png',
         bgImage: '/assets/bg_temple.png',
         maxHp: 5000000,
         timeLimit: 360, // 6 phút
-        skillName: 'Ma Nhãn Tia Hủy Diệt',
-        skillDesc: 'Phóng chùm laser chết chóc từ hai mắt thiêu rụi toàn bộ thợ săn!',
-        themeColor: '#ef4444',
-        bgGradient: 'radial-gradient(circle at 50% 35%, rgba(239, 68, 68, 0.35) 0%, rgba(20, 5, 5, 0.95) 75%)'
+        skillName: 'Hơi Thở Rồng Hủy Diệt',
+        skillDesc: 'Phun trào biển lửa rồng hắc ám thiêu rụi toàn bộ thợ săn cấp quốc gia!',
+        themeColor: '#ff0033',
+        bgGradient: 'radial-gradient(circle at 50% 35%, rgba(255, 0, 51, 0.35) 0%, rgba(25, 5, 5, 0.95) 75%)'
     }
 ];
 
