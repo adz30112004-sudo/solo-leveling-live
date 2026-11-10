@@ -80,17 +80,29 @@ let myHunterId = localStorage.getItem('solo_hunter_id');
 let myHunterName = localStorage.getItem('solo_hunter_name');
 let myHunterAvatar = localStorage.getItem('solo_hunter_avatar');
 
-if (!myHunterId) {
+// Kho avatar và tên TikTok Việt cực thật
+const VIET_TIKTOK_SAMPLE_USERS = [
+    { name: 'Nguyễn Hoàng Long', avatar: 'https://images.unsplash.com/photo-1506794778202-cad84cf45f1d?w=150' },
+    { name: 'Khánh Huyền ✨', avatar: 'https://images.unsplash.com/photo-1517841905240-472988babdf9?w=150' },
+    { name: 'Duy Nến Gaming 🎮', avatar: 'https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?w=150' },
+    { name: 'Minh Quân 2k4', avatar: 'https://images.unsplash.com/photo-1539571696357-5a69c17a67c6?w=150' },
+    { name: 'Thuỳ Linh 2k3 🌸', avatar: 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=150' },
+    { name: 'Boy Phố Hải Phòng 🏍️', avatar: 'https://images.unsplash.com/photo-1560250097-0b93528c311a?w=150' },
+    { name: 'Lê Tuấn Anh', avatar: 'https://images.unsplash.com/photo-1492562080023-ab3db95bfbce?w=150' },
+    { name: 'Bé Heo Dễ Thương 🐷', avatar: 'https://images.unsplash.com/photo-1548142813-c348350df52b?w=150' },
+    { name: 'Phan Bảo Nam', avatar: 'https://images.unsplash.com/photo-1501196354995-cbb51c65aaea?w=150' },
+    { name: 'Ngọc Ánh 🎀', avatar: 'https://images.unsplash.com/photo-1544005313-94ddf0286df2?w=150' },
+    { name: 'Mèo Béo Đô Thị 🐱', avatar: 'https://images.unsplash.com/photo-1514888286974-6c03e2ca1dba?w=150' },
+    { name: 'Cậu Út Miền Tây 🌾', avatar: 'https://images.unsplash.com/photo-1522075469751-3a6694fb2f61?w=150' },
+    { name: 'Hải Yến 🍑', avatar: 'https://images.unsplash.com/photo-1524504388940-b1c1722653e1?w=150' }
+];
+
+if (!myHunterId || !myHunterName || myHunterName.startsWith('Thợ Săn #') || myHunterName === 'Thợ Săn Solo') {
+    const picked = VIET_TIKTOK_SAMPLE_USERS[Math.floor(Math.random() * VIET_TIKTOK_SAMPLE_USERS.length)];
     const randNum = Math.floor(1000 + Math.random() * 9000);
-    myHunterId = 'hunter_' + randNum;
-    myHunterName = 'Thợ Săn #' + randNum;
-    const sampleAvatars = [
-        'https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?w=150',
-        'https://images.unsplash.com/photo-1570295999919-56ceb5ecca61?w=150',
-        'https://images.unsplash.com/photo-1494790108377-be9c29b29330?w=150',
-        'https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=150'
-    ];
-    myHunterAvatar = sampleAvatars[Math.floor(Math.random() * sampleAvatars.length)];
+    myHunterId = 'hunter_vn_' + randNum;
+    myHunterName = picked.name;
+    myHunterAvatar = picked.avatar;
     localStorage.setItem('solo_hunter_id', myHunterId);
     localStorage.setItem('solo_hunter_name', myHunterName);
     localStorage.setItem('solo_hunter_avatar', myHunterAvatar);

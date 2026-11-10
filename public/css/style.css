@@ -98,8 +98,15 @@ body {
 }
 
 @keyframes crownFloat {
-    0%, 100% { transform: translateY(0); }
-    50% { transform: translateY(-3px); }
+
+    0%,
+    100% {
+        transform: translateY(0);
+    }
+
+    50% {
+        transform: translateY(-3px);
+    }
 }
 
 .hunter-avatar {
@@ -198,7 +205,9 @@ body {
     gap: 4px;
 }
 
-.boss-skull { font-size: 13px; }
+.boss-skull {
+    font-size: 13px;
+}
 
 .boss-name {
     font-family: 'Cinzel', serif;
@@ -276,6 +285,7 @@ body {
 .dps-board::-webkit-scrollbar {
     width: 2px;
 }
+
 .dps-board::-webkit-scrollbar-thumb {
     background: rgba(0, 198, 255, 0.35);
     border-radius: 2px;
@@ -402,18 +412,21 @@ body {
     line-height: 1.1;
 }
 
-.dps-rank-mini.rank-s, .dps-rank-mini.rank-quốc-gia {
+.dps-rank-mini.rank-s,
+.dps-rank-mini.rank-quốc-gia {
     background: rgba(255, 215, 0, 0.25);
     color: #ffd700;
     font-weight: 900;
 }
 
-.dps-rank-mini.rank-a, .dps-rank-mini.rank-b {
+.dps-rank-mini.rank-a,
+.dps-rank-mini.rank-b {
     background: rgba(168, 85, 247, 0.25);
     color: #c084fc;
 }
 
-.dps-rank-mini.rank-c, .dps-rank-mini.rank-d {
+.dps-rank-mini.rank-c,
+.dps-rank-mini.rank-d {
     background: rgba(59, 130, 246, 0.2);
     color: #60a5fa;
 }
@@ -508,8 +521,15 @@ body {
 }
 
 @keyframes bossHover {
-    0%, 100% { transform: translateY(0); }
-    50% { transform: translateY(-8px); }
+
+    0%,
+    100% {
+        transform: translateY(0);
+    }
+
+    50% {
+        transform: translateY(-8px);
+    }
 }
 
 .boss-aura {
@@ -524,8 +544,17 @@ body {
 }
 
 @keyframes auraPulse {
-    0%, 100% { transform: scale(0.9); opacity: 0.6; }
-    50% { transform: scale(1.15); opacity: 0.95; }
+
+    0%,
+    100% {
+        transform: scale(0.9);
+        opacity: 0.6;
+    }
+
+    50% {
+        transform: scale(1.15);
+        opacity: 0.95;
+    }
 }
 
 .boss-sprite {
@@ -565,6 +594,7 @@ body {
         transform: scale(0.6) rotate(-25deg);
         filter: drop-shadow(0 0 10px #ff0055);
     }
+
     100% {
         opacity: 0;
         transform: scale(1.4) rotate(15deg);
@@ -589,7 +619,7 @@ body {
     position: absolute;
     font-family: 'Montserrat', sans-serif;
     font-weight: 900;
-    text-shadow: 0 2px 5px rgba(0,0,0,0.9), 0 0 10px rgba(0,0,0,0.8);
+    text-shadow: 0 2px 5px rgba(0, 0, 0, 0.9), 0 0 10px rgba(0, 0, 0, 0.8);
     pointer-events: none;
     animation: floatDamage 0.85s cubic-bezier(0.18, 0.89, 0.32, 1.28) forwards;
 }
@@ -616,14 +646,17 @@ body {
         opacity: 0;
         transform: translateY(0) scale(0.5);
     }
+
     20% {
         opacity: 1;
         transform: translateY(-20px) scale(1.2);
     }
+
     80% {
         opacity: 1;
         transform: translateY(-55px) scale(1.0);
     }
+
     100% {
         opacity: 0;
         transform: translateY(-75px) scale(0.8);
@@ -648,7 +681,9 @@ body {
     z-index: 10;
 }
 
-.hunters-field::-webkit-scrollbar { display: none; }
+.hunters-field::-webkit-scrollbar {
+    display: none;
+}
 
 .hunter-soldier {
     display: flex;
@@ -659,8 +694,15 @@ body {
 }
 
 @keyframes soldierSpawn {
-    0% { transform: scale(0); opacity: 0; }
-    100% { transform: scale(1); opacity: 1; }
+    0% {
+        transform: scale(0);
+        opacity: 0;
+    }
+
+    100% {
+        transform: scale(1);
+        opacity: 1;
+    }
 }
 
 .soldier-avatar-wrap {
@@ -682,9 +724,17 @@ body {
     box-shadow: 0 0 12px #a855f7;
 }
 
-.soldier-avatar.rank-a { border-color: #f59e0b; }
-.soldier-avatar.rank-b { border-color: #00c6ff; }
-.soldier-avatar.rank-c { border-color: #00ff88; }
+.soldier-avatar.rank-a {
+    border-color: #f59e0b;
+}
+
+.soldier-avatar.rank-b {
+    border-color: #00c6ff;
+}
+
+.soldier-avatar.rank-c {
+    border-color: #00ff88;
+}
 
 .soldier-rank-badge {
     position: absolute;
@@ -739,8 +789,15 @@ body {
 }
 
 @keyframes toastPop {
-    0% { transform: scale(0.6) translateY(10px); opacity: 0; }
-    100% { transform: scale(1) translateY(0); opacity: 1; }
+    0% {
+        transform: scale(0.6) translateY(10px);
+        opacity: 0;
+    }
+
+    100% {
+        transform: scale(1) translateY(0);
+        opacity: 1;
+    }
 }
 
 .toast-avatar {
@@ -781,8 +838,15 @@ body {
 }
 
 @keyframes ariseIn {
-    0% { opacity: 0; transform: scale(1.1); }
-    100% { opacity: 1; transform: scale(1); }
+    0% {
+        opacity: 0;
+        transform: scale(1.1);
+    }
+
+    100% {
+        opacity: 1;
+        transform: scale(1);
+    }
 }
 
 .arise-content {
@@ -804,8 +868,15 @@ body {
 }
 
 @keyframes ariseGlow {
-    0% { transform: scale(1); filter: brightness(1); }
-    100% { transform: scale(1.06); filter: brightness(1.4); }
+    0% {
+        transform: scale(1);
+        filter: brightness(1);
+    }
+
+    100% {
+        transform: scale(1.06);
+        filter: brightness(1.4);
+    }
 }
 
 .arise-subtext {
@@ -861,8 +932,15 @@ body {
 }
 
 @keyframes bannerPop {
-    0% { transform: scale(0.5); opacity: 0; }
-    100% { transform: scale(1); opacity: 1; }
+    0% {
+        transform: scale(0.5);
+        opacity: 0;
+    }
+
+    100% {
+        transform: scale(1);
+        opacity: 1;
+    }
 }
 
 .vic-title {
@@ -986,11 +1064,13 @@ body {
     color: #ffd700;
     font-weight: 900;
 }
+
 .coin-num-arise {
     font-size: 7px;
     color: #c084fc;
     font-weight: 900;
 }
+
 .coin-num-gold {
     font-size: 7px;
     color: #f59e0b;
@@ -1002,7 +1082,8 @@ body {
     font-weight: 700;
     color: #94a3b8;
 }
-    color: #94a3b8;
+
+color: #94a3b8;
 }
 
 /* Biến thể từng loại kỹ năng / quà tặng */
@@ -1010,31 +1091,38 @@ body {
     border-color: rgba(56, 189, 248, 0.5);
     background: linear-gradient(135deg, rgba(8, 25, 45, 0.9), rgba(5, 15, 30, 0.95));
 }
+
 .skill-pill.combo {
     border-color: rgba(245, 158, 11, 0.5);
     background: linear-gradient(135deg, rgba(40, 25, 5, 0.9), rgba(25, 15, 5, 0.95));
 }
+
 .skill-pill.rose {
     border-color: rgba(244, 63, 94, 0.5);
     background: linear-gradient(135deg, rgba(40, 10, 20, 0.9), rgba(25, 5, 15, 0.95));
 }
+
 .skill-pill.heart {
     border-color: rgba(225, 29, 72, 0.5);
     background: linear-gradient(135deg, rgba(45, 10, 25, 0.9), rgba(30, 5, 18, 0.95));
 }
+
 .skill-pill.rosa {
     border-color: rgba(190, 18, 60, 0.5);
     background: linear-gradient(135deg, rgba(40, 8, 20, 0.9), rgba(25, 5, 15, 0.95));
 }
+
 .skill-pill.perfume {
     border-color: rgba(136, 19, 55, 0.5);
     background: linear-gradient(135deg, rgba(35, 8, 22, 0.9), rgba(20, 5, 15, 0.95));
 }
+
 .skill-pill.arise {
     border-color: #a855f7;
     background: linear-gradient(135deg, rgba(35, 10, 60, 0.95), rgba(18, 5, 35, 0.98));
     box-shadow: 0 0 10px rgba(168, 85, 247, 0.45);
 }
+
 .skill-pill.car {
     border-color: #eab308;
     background: linear-gradient(135deg, rgba(45, 30, 5, 0.95), rgba(25, 18, 2, 0.98));
@@ -1051,7 +1139,9 @@ body {
     font-weight: 900;
 }
 
-.hidden { display: none !important; }
+.hidden {
+    display: none !important;
+}
 
 /* =========================================
    10. HỆ THỐNG NỘ KHÍ & QUÁI ĐÁNH TRẢ (COUNTER-ATTACK)
@@ -1134,8 +1224,13 @@ body {
 }
 
 @keyframes bossChargingShake {
-    0% { transform: scale(1.08) translate(-3px, -2px) rotate(-1deg); }
-    100% { transform: scale(1.12) translate(3px, 2px) rotate(1deg); }
+    0% {
+        transform: scale(1.08) translate(-3px, -2px) rotate(-1deg);
+    }
+
+    100% {
+        transform: scale(1.12) translate(3px, 2px) rotate(1deg);
+    }
 }
 
 .boss-charging .boss-aura {
@@ -1144,8 +1239,16 @@ body {
 }
 
 @keyframes auraHyperCharge {
-    0% { transform: scale(1.1); opacity: 0.8; }
-    100% { transform: scale(1.6); opacity: 1; filter: blur(20px); }
+    0% {
+        transform: scale(1.1);
+        opacity: 0.8;
+    }
+
+    100% {
+        transform: scale(1.6);
+        opacity: 1;
+        filter: blur(20px);
+    }
 }
 
 /* TRẠNG THÁI QUÁI ĐÁNH TRẢ (COUNTER-ATTACK LUNGE) */
@@ -1154,10 +1257,22 @@ body {
 }
 
 @keyframes bossLungeAttack {
-    0% { transform: scale(1); }
-    35% { transform: scale(0.9) translateY(-20px); }
-    55% { transform: scale(1.45) translateY(45px); filter: brightness(1.8) drop-shadow(0 0 40px #ff0000); }
-    100% { transform: scale(1) translateY(0); }
+    0% {
+        transform: scale(1);
+    }
+
+    35% {
+        transform: scale(0.9) translateY(-20px);
+    }
+
+    55% {
+        transform: scale(1.45) translateY(45px);
+        filter: brightness(1.8) drop-shadow(0 0 40px #ff0000);
+    }
+
+    100% {
+        transform: scale(1) translateY(0);
+    }
 }
 
 /* TRẠNG THÁI CHOÁNG (STUNNED) */
@@ -1168,8 +1283,13 @@ body {
 }
 
 @keyframes bossStunWobble {
-    0% { transform: rotate(4deg) scale(0.92) translateY(15px); }
-    100% { transform: rotate(-4deg) scale(0.92) translateY(20px); }
+    0% {
+        transform: rotate(4deg) scale(0.92) translateY(15px);
+    }
+
+    100% {
+        transform: rotate(-4deg) scale(0.92) translateY(20px);
+    }
 }
 
 .boss-stun-stars {
@@ -1191,9 +1311,17 @@ body {
 }
 
 @keyframes rotateStars {
-    0% { transform: rotate(0deg) scale(0.9); }
-    50% { transform: rotate(180deg) scale(1.2); }
-    100% { transform: rotate(360deg) scale(0.9); }
+    0% {
+        transform: rotate(0deg) scale(0.9);
+    }
+
+    50% {
+        transform: rotate(180deg) scale(1.2);
+    }
+
+    100% {
+        transform: rotate(360deg) scale(0.9);
+    }
 }
 
 .stun-label {
@@ -1226,8 +1354,15 @@ body {
 }
 
 @keyframes alertPopIn {
-    0% { transform: translate(-50%, -50%) scale(0.7); opacity: 0; }
-    100% { transform: translate(-50%, -50%) scale(1); opacity: 1; }
+    0% {
+        transform: translate(-50%, -50%) scale(0.7);
+        opacity: 0;
+    }
+
+    100% {
+        transform: translate(-50%, -50%) scale(1);
+        opacity: 1;
+    }
 }
 
 .charge-header {
@@ -1248,8 +1383,15 @@ body {
 }
 
 @keyframes sirenFlash {
-    0% { transform: scale(0.9); filter: brightness(1); }
-    100% { transform: scale(1.3); filter: brightness(2); }
+    0% {
+        transform: scale(0.9);
+        filter: brightness(1);
+    }
+
+    100% {
+        transform: scale(1.3);
+        filter: brightness(2);
+    }
 }
 
 .charge-skill-name {
@@ -1352,10 +1494,24 @@ body {
 }
 
 @keyframes clawSlashAnim {
-    0% { opacity: 0; transform: rotate(-35deg) scaleX(0.1); }
-    20% { opacity: 1; transform: rotate(-35deg) scaleX(1); }
-    80% { opacity: 1; }
-    100% { opacity: 0; transform: rotate(-35deg) scaleX(1.1); }
+    0% {
+        opacity: 0;
+        transform: rotate(-35deg) scaleX(0.1);
+    }
+
+    20% {
+        opacity: 1;
+        transform: rotate(-35deg) scaleX(1);
+    }
+
+    80% {
+        opacity: 1;
+    }
+
+    100% {
+        opacity: 0;
+        transform: rotate(-35deg) scaleX(1.1);
+    }
 }
 
 .attack-impact-text {
@@ -1373,10 +1529,25 @@ body {
 }
 
 @keyframes impactTextAnim {
-    0% { transform: translate(-50%, -50%) scale(0.5); opacity: 0; }
-    30% { transform: translate(-50%, -50%) scale(1.3); opacity: 1; }
-    70% { transform: translate(-50%, -50%) scale(1.1); opacity: 1; }
-    100% { transform: translate(-50%, -50%) scale(0.9); opacity: 0; }
+    0% {
+        transform: translate(-50%, -50%) scale(0.5);
+        opacity: 0;
+    }
+
+    30% {
+        transform: translate(-50%, -50%) scale(1.3);
+        opacity: 1;
+    }
+
+    70% {
+        transform: translate(-50%, -50%) scale(1.1);
+        opacity: 1;
+    }
+
+    100% {
+        transform: translate(-50%, -50%) scale(0.9);
+        opacity: 0;
+    }
 }
 
 /* RUNG MÀN HÌNH BẠO LIỆT (SCREEN SHAKE HEAVY) */
@@ -1385,11 +1556,31 @@ body {
 }
 
 @keyframes screenShakeHeavyAnim {
-    10%, 90% { transform: translate3d(-6px, 0, 0) scale(1.02); }
-    20%, 80% { transform: translate3d(8px, -4px, 0) scale(1.02); }
-    30%, 50%, 70% { transform: translate3d(-10px, 8px, 0) scale(1.03); }
-    40%, 60% { transform: translate3d(10px, -6px, 0) scale(1.03); }
-    100% { transform: translate3d(0, 0, 0) scale(1); }
+
+    10%,
+    90% {
+        transform: translate3d(-6px, 0, 0) scale(1.02);
+    }
+
+    20%,
+    80% {
+        transform: translate3d(8px, -4px, 0) scale(1.02);
+    }
+
+    30%,
+    50%,
+    70% {
+        transform: translate3d(-10px, 8px, 0) scale(1.03);
+    }
+
+    40%,
+    60% {
+        transform: translate3d(10px, -6px, 0) scale(1.03);
+    }
+
+    100% {
+        transform: translate3d(0, 0, 0) scale(1);
+    }
 }
 
 /* FLASH ĐỎ TOÀN MÀN HÌNH KHI BỊ QUÁI ĐÁNH TRẢ */
@@ -1406,8 +1597,13 @@ body {
 }
 
 @keyframes flashRedAnim {
-    0% { opacity: 1; }
-    100% { opacity: 0; }
+    0% {
+        opacity: 1;
+    }
+
+    100% {
+        opacity: 0;
+    }
 }
 
 /* =========================================
@@ -1441,14 +1637,38 @@ body {
 }
 
 @keyframes timerPulseWarn {
-    0% { transform: scale(1); filter: brightness(1); }
-    100% { transform: scale(1.05); filter: brightness(1.3); }
+    0% {
+        transform: scale(1);
+        filter: brightness(1);
+    }
+
+    100% {
+        transform: scale(1.05);
+        filter: brightness(1.3);
+    }
 }
 
-.timer-icon { font-size: 12px; }
-.timer-label { font-size: 8px; font-weight: 800; color: #94a3b8; letter-spacing: 0.5px; }
-.timer-clock { font-size: 12.5px; font-weight: 900; color: #00c6ff; font-family: monospace; }
-.dungeon-timer-box.timer-warning .timer-clock { color: #ef4444 !important; }
+.timer-icon {
+    font-size: 12px;
+}
+
+.timer-label {
+    font-size: 8px;
+    font-weight: 800;
+    color: #94a3b8;
+    letter-spacing: 0.5px;
+}
+
+.timer-clock {
+    font-size: 12.5px;
+    font-weight: 900;
+    color: #00c6ff;
+    font-family: monospace;
+}
+
+.dungeon-timer-box.timer-warning .timer-clock {
+    color: #ef4444 !important;
+}
 
 /* BẢNG THÔNG BÁO HẾT GIỜ THẤT BẠI */
 .defeat-banner {
@@ -1471,8 +1691,15 @@ body {
 }
 
 @keyframes defeatBannerPop {
-    0% { transform: translate(-50%, -50%) scale(0.6); opacity: 0; }
-    100% { transform: translate(-50%, -50%) scale(1); opacity: 1; }
+    0% {
+        transform: translate(-50%, -50%) scale(0.6);
+        opacity: 0;
+    }
+
+    100% {
+        transform: translate(-50%, -50%) scale(1);
+        opacity: 1;
+    }
 }
 
 .defeat-skull {
@@ -1512,8 +1739,15 @@ body {
 }
 
 @keyframes attackSubPulse {
-    0% { transform: scale(0.95); opacity: 0.8; }
-    100% { transform: scale(1.05); opacity: 1; }
+    0% {
+        transform: scale(0.95);
+        opacity: 0.8;
+    }
+
+    100% {
+        transform: scale(1.05);
+        opacity: 1;
+    }
 }
 
 /* =========================================
@@ -1544,9 +1778,11 @@ body {
         opacity: 0;
         transform: translateX(-50%) scale(0.65) translateY(-20px);
     }
+
     75% {
         transform: translateX(-50%) scale(1.03) translateY(2px);
     }
+
     100% {
         opacity: 1;
         transform: translateX(-50%) scale(1) translateY(0);
@@ -1558,6 +1794,7 @@ body {
         opacity: 1;
         transform: translateX(-50%) scale(1) translateY(0);
     }
+
     100% {
         opacity: 0;
         transform: translateX(-50%) scale(0.85) translateY(-25px);
@@ -1572,23 +1809,31 @@ body {
     border-color: #00ffff;
     pointer-events: none;
 }
+
 .sys-bracket.top-left {
-    top: -2px; left: -2px;
+    top: -2px;
+    left: -2px;
     border-top: 3px solid #00ffff;
     border-left: 3px solid #00ffff;
 }
+
 .sys-bracket.top-right {
-    top: -2px; right: -2px;
+    top: -2px;
+    right: -2px;
     border-top: 3px solid #00ffff;
     border-right: 3px solid #00ffff;
 }
+
 .sys-bracket.bottom-left {
-    bottom: -2px; left: -2px;
+    bottom: -2px;
+    left: -2px;
     border-bottom: 3px solid #00ffff;
     border-left: 3px solid #00ffff;
 }
+
 .sys-bracket.bottom-right {
-    bottom: -2px; right: -2px;
+    bottom: -2px;
+    right: -2px;
     border-bottom: 3px solid #00ffff;
     border-right: 3px solid #00ffff;
 }
@@ -1615,8 +1860,16 @@ body {
 }
 
 @keyframes iconPulse {
-    0% { transform: scale(0.85); opacity: 0.7; }
-    100% { transform: scale(1.15); opacity: 1; filter: drop-shadow(0 0 6px #00d2ff); }
+    0% {
+        transform: scale(0.85);
+        opacity: 0.7;
+    }
+
+    100% {
+        transform: scale(1.15);
+        opacity: 1;
+        filter: drop-shadow(0 0 6px #00d2ff);
+    }
 }
 
 .level-up-headline {
@@ -1657,7 +1910,9 @@ body {
 }
 
 @keyframes rotateGlow {
-    100% { transform: rotate(360deg); }
+    100% {
+        transform: rotate(360deg);
+    }
 }
 
 .lvl-avatar-img {
@@ -1725,8 +1980,13 @@ body {
 }
 
 @keyframes arrowNudge {
-    0% { transform: translateX(-2px); }
-    100% { transform: translateX(2px); }
+    0% {
+        transform: translateX(-2px);
+    }
+
+    100% {
+        transform: translateX(2px);
+    }
 }
 
 .lvl-to-num {

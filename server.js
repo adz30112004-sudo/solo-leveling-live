@@ -132,14 +132,75 @@ let topDonators = [];
 // Quân đoàn bóng tối (những người kích hoạt Arise 99+ xu)
 const shadowArmy = [];
 
-// Avatar mặc định khi test
+// Avatar mặc định khi test (Kho ảnh đa dạng chuẩn style TikTok Việt: nam nữ trẻ, selfie, cafe, phố, gaming, pet)
 const DEFAULT_AVATARS = [
-    'https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?w=150',
-    'https://images.unsplash.com/photo-1570295999919-56ceb5ecca61?w=150',
-    'https://images.unsplash.com/photo-1527980965255-d3b416303d12?w=150',
-    'https://images.unsplash.com/photo-1494790108377-be9c29b29330?w=150',
-    'https://images.unsplash.com/photo-1544005313-94ddf0286df2?w=150'
+    'https://images.unsplash.com/photo-1506794778202-cad84cf45f1d?w=150', // Nam ngầu streetwear
+    'https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=150', // Nữ xinh cafe selfie
+    'https://images.unsplash.com/photo-1539571696357-5a69c17a67c6?w=150', // Nam trẻ năng động 2k
+    'https://images.unsplash.com/photo-1517841905240-472988babdf9?w=150', // Nữ aesthetic xinh xắn
+    'https://images.unsplash.com/photo-1492562080023-ab3db95bfbce?w=150', // Nam thư sinh thanh lịch
+    'https://images.unsplash.com/photo-1544005313-94ddf0286df2?w=150', // Nữ thanh lịch
+    'https://images.unsplash.com/photo-1522075469751-3a6694fb2f61?w=150', // Nam nụ cười tươi
+    'https://images.unsplash.com/photo-1548142813-c348350df52b?w=150', // Bé gái đáng yêu tươi tắn
+    'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=150', // Nam cá tính
+    'https://images.unsplash.com/photo-1508214751196-bcfd4ca60f91?w=150', // Nữ cười rạng rỡ
+    'https://images.unsplash.com/photo-1541823709867-1b206113eafd?w=150', // Nam học sinh cá tính
+    'https://images.unsplash.com/photo-1524504388940-b1c1722653e1?w=150', // Nữ cá tính sang chảnh
+    'https://images.unsplash.com/photo-1501196354995-cbb51c65aaea?w=150', // Nam phong cách nghệ thuật
+    'https://images.unsplash.com/photo-1531746020798-e6953c6e8e04?w=150', // Nữ phong cách thời thượng
+    'https://images.unsplash.com/photo-1560250097-0b93528c311a?w=150', // Nam bảnh bao
+    'https://images.unsplash.com/photo-1529626455594-4ff0802cfb7e?w=150', // Nữ người mẫu xinh đẹp
+    'https://images.unsplash.com/photo-1514888286974-6c03e2ca1dba?w=150', // Meme mèo béo cưng
+    'https://images.unsplash.com/photo-1517849845537-4d257902454a?w=150', // Cún cưng đáng yêu
+    'https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?w=150', // Gamer nam 3D
+    'https://images.unsplash.com/photo-1494790108377-be9c29b29330?w=150'  // Nữ nụ cười ngọt ngào
 ];
+
+// Danh sách hồ sơ nick TikTok Việt Nam cực thật: tên thật kèm năm sinh, nickname gaming, meme, icon bio
+const VIET_TIKTOK_PROFILES = [
+    // --- Nam trẻ tuổi (Streetwear, Sinh viên, Cafe, Gamer) ---
+    { id: 'vn_01', nickname: 'Nguyễn Hoàng Long', avatar: 'https://images.unsplash.com/photo-1506794778202-cad84cf45f1d?w=150', quote: 'Ma lực Hắc Ám Hoàng Đế bùng nổ đến đỉnh cao!' },
+    { id: 'vn_02', nickname: 'Minh Quân 2k4', avatar: 'https://images.unsplash.com/photo-1539571696357-5a69c17a67c6?w=150', quote: 'Tuyệt kỹ Trảm Phong phá tan kết giới hắc ám!' },
+    { id: 'vn_03', nickname: 'Lê Tuấn Anh', avatar: 'https://images.unsplash.com/photo-1492562080023-ab3db95bfbce?w=150', quote: 'Cường hoá thân thể đạt cảnh giới Thiết Giáp!' },
+    { id: 'vn_04', nickname: 'Đặng Gia Huy', avatar: 'https://images.unsplash.com/photo-1522075469751-3a6694fb2f61?w=150', quote: 'Ánh sáng công lý thanh tẩy Hầm Ngục!' },
+    { id: 'vn_05', nickname: 'Phan Bảo Nam', avatar: 'https://images.unsplash.com/photo-1501196354995-cbb51c65aaea?w=150', quote: 'Cung tên Ma Thuật bách phát bách trúng!' },
+    { id: 'vn_06', nickname: 'Vũ Đức Thắng', avatar: 'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=150', quote: 'Thiết quyền bộc phá công phá vạn dặm!' },
+    { id: 'vn_07', nickname: 'Trần Tiến Đạt', avatar: 'https://images.unsplash.com/photo-1541823709867-1b206113eafd?w=150', quote: 'Triệu hồi Lôi Thần giáng thế trừng phạt!' },
+    { id: 'vn_08', nickname: 'Boy Phố Hải Phòng 🏍️', avatar: 'https://images.unsplash.com/photo-1560250097-0b93528c311a?w=150', quote: 'Không lòng vòng, lướt lẹ chém gục Boss!' },
+    { id: 'vn_09', nickname: 'Duy Nến Gaming 🎮', avatar: 'https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?w=150', quote: 'Cày chay lên Top 1 Thợ Săn không nạp xu!' },
+    { id: 'vn_10', nickname: '_hoanglong.99_', avatar: 'https://images.unsplash.com/photo-1570295999919-56ceb5ecca61?w=150', quote: 'Bật Mode Chiến Binh săn lùng Boss thế giới!' },
+
+    // --- Nữ trẻ tuổi (Selfie cafe, Xinh xắn, Aesthetic, Dễ thương) ---
+    { id: 'vn_11', nickname: 'Khánh Huyền ✨', avatar: 'https://images.unsplash.com/photo-1517841905240-472988babdf9?w=150', quote: 'Kiếm pháp Vũ Điệu Ánh Sáng đạt cảnh giới mới!' },
+    { id: 'vn_12', nickname: 'Thuỳ Linh 2k3 🌸', avatar: 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=150', quote: 'Phép thuật Băng Tuyết phong ấn vạn vật!' },
+    { id: 'vn_13', nickname: 'Ngọc Ánh 🎀', avatar: 'https://images.unsplash.com/photo-1544005313-94ddf0286df2?w=150', quote: 'Thánh quang trị liệu hồi phục toàn bộ binh đoàn!' },
+    { id: 'vn_14', nickname: 'Mai Phương Thảo', avatar: 'https://images.unsplash.com/photo-1508214751196-bcfd4ca60f91?w=150', quote: 'Mũi tên Xuyên Tâm tiêu diệt điểm yếu Boss!' },
+    { id: 'vn_15', nickname: 'Hương Giang 2k5', avatar: 'https://images.unsplash.com/photo-1531746020798-e6953c6e8e04?w=150', quote: 'Sức mạnh Tinh Linh hộ thể bảo vệ đồng đội!' },
+    { id: 'vn_16', nickname: 'Hải Yến 🍑', avatar: 'https://images.unsplash.com/photo-1524504388940-b1c1722653e1?w=150', quote: 'Tốc độ xuất chiêu nhanh như chớp nhoáng!' },
+    { id: 'vn_17', nickname: 'Bé Heo Dễ Thương 🐷', avatar: 'https://images.unsplash.com/photo-1548142813-c348350df52b?w=150', quote: 'Bé Heo ra tay, gõ bay máu Boss!' },
+    { id: 'vn_18', nickname: 'Bích Phương 🌻', avatar: 'https://images.unsplash.com/photo-1529626455594-4ff0802cfb7e?w=150', quote: 'Khúc ca Chiến Thắng vang vọng khắp Chiến Trường!' },
+    { id: 'vn_19', nickname: 'linh.candy_', avatar: 'https://images.unsplash.com/photo-1494790108377-be9c29b29330?w=150', quote: 'Kẹo ngọt nhưng chém ngọt như kiếm katana!' },
+    { id: 'vn_20', nickname: 'Cô Bé Mùa Đông ❄️', avatar: 'https://images.unsplash.com/photo-1573496359142-b8d87734a5a2?w=150', quote: 'Hàn khí cực độ làm chậm mọi chiêu thức Boss!' },
+
+    // --- Trend TikTok / Meme / Độc Đáo ---
+    { id: 'vn_21', nickname: 'Mèo Béo Đô Thị 🐱', avatar: 'https://images.unsplash.com/photo-1514888286974-6c03e2ca1dba?w=150', quote: 'Móng vuốt Mèo Béo cào rách giáp Boss!' },
+    { id: 'vn_22', nickname: 'Cún Con Đi Lạc 🐶', avatar: 'https://images.unsplash.com/photo-1517849845537-4d257902454a?w=150', quote: 'Cún con nổi giận hoá thành Ma Sói Hắc Ám!' },
+    { id: 'vn_23', nickname: 'Trùm PK Gõ Phím ⌨️', avatar: 'https://images.unsplash.com/photo-1506794778202-cad84cf45f1d?w=150', quote: 'Tốc độ 300 phím/phút, combo không đối thủ!' },
+    { id: 'vn_24', nickname: 'Cậu Út Miền Tây 🌾', avatar: 'https://images.unsplash.com/photo-1522075469751-3a6694fb2f61?w=150', quote: 'Dân quê chân chất nhưng đấm phát Boss bay màu!' },
+    { id: 'vn_25', nickname: 'Tuấn Mõm Không Cay 🌶️', avatar: 'https://images.unsplash.com/photo-1539571696357-5a69c17a67c6?w=150', quote: 'Mõm thì mõm chứ gánh team là có thật!' },
+    { id: 'vn_26', nickname: 'Thánh Thả Tim 99 ❤️', avatar: 'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=150', quote: 'Triệu hồi Cơn Mưa Tim tăng tốc toàn đội!' },
+    { id: 'vn_27', nickname: 'Bé Na 2k5 🐍', avatar: 'https://images.unsplash.com/photo-1517841905240-472988babdf9?w=150', quote: 'Độc dược Tê Tái khiến Boss mất nửa bình máu!' },
+    { id: 'vn_28', nickname: 'Quân Sư Quạt Mo 🪭', avatar: 'https://images.unsplash.com/photo-1501196354995-cbb51c65aaea?w=150', quote: 'Bày binh bố trận, Boss chỉ có đường quy phục!' },
+    { id: 'vn_29', nickname: 'Đạt Villa Fan ⚡', avatar: 'https://images.unsplash.com/photo-1541823709867-1b206113eafd?w=150', quote: 'Sức mạnh đoàn kết gia đình Villa công phá!' },
+    { id: 'vn_30', nickname: 'Hưng Đẹp Trai 🕶️', avatar: 'https://images.unsplash.com/photo-1570295999919-56ceb5ecca61?w=150', quote: 'Đẹp trai có gì sai? Boss cũng phải nể phục!' }
+];
+
+let vietProfileCounter = 0;
+function getRandomVietTikTokProfile() {
+    // Trả về profile xoay vòng tránh trùng lặp liên tiếp
+    const idx = (vietProfileCounter++) % VIET_TIKTOK_PROFILES.length;
+    return VIET_TIKTOK_PROFILES[idx];
+}
 
 // Hàm xếp hạng Thợ Săn dựa trên EXP
 function calculateRank(exp, diamonds) {
@@ -159,10 +220,17 @@ function calculateLevel(exp) {
 // Lấy hoặc tạo hồ sơ người chơi
 function getOrCreatePlayer(uniqueId, nickname, avatar) {
     if (!players.has(uniqueId)) {
+        let finalNick = nickname;
+        let finalAvatar = avatar;
+        if (!finalNick || finalNick.startsWith('Thợ Săn #') || finalNick === 'Thợ Săn Solo' || finalNick === 'Thợ Săn') {
+            const randomProf = getRandomVietTikTokProfile();
+            finalNick = (finalNick && !finalNick.startsWith('Thợ Săn')) ? finalNick : randomProf.nickname;
+            if (!finalAvatar) finalAvatar = randomProf.avatar;
+        }
         players.set(uniqueId, {
             uniqueId,
-            nickname: nickname || uniqueId,
-            avatar: avatar || DEFAULT_AVATARS[Math.floor(Math.random() * DEFAULT_AVATARS.length)],
+            nickname: finalNick || uniqueId,
+            avatar: finalAvatar || DEFAULT_AVATARS[Math.floor(Math.random() * DEFAULT_AVATARS.length)],
             rank: 'E',
             level: 1,
             exp: 0,
@@ -173,7 +241,7 @@ function getOrCreatePlayer(uniqueId, nickname, avatar) {
         });
     }
     const p = players.get(uniqueId);
-    if (nickname) p.nickname = nickname;
+    if (nickname && !nickname.startsWith('Thợ Săn #')) p.nickname = nickname;
     if (avatar) p.avatar = avatar;
     p.lastAttackTime = Date.now();
     return p;
@@ -775,17 +843,21 @@ io.on('connection', (socket) => {
 
     // ADMIN & CLIENT ATTACK EVENTS
     socket.on('player_attack', (data) => {
-        const uid = (data && data.uniqueId) || 'hunter_solo';
-        const nick = (data && data.nickname) || 'Thợ Săn Solo';
-        const user = getOrCreatePlayer(uid, nick, data && data.avatar);
+        const fallbackProf = getRandomVietTikTokProfile();
+        const uid = (data && data.uniqueId) || ('hunter_' + Math.floor(1000 + Math.random() * 9000));
+        const nick = (data && data.nickname && !data.nickname.startsWith('Thợ Săn #')) ? data.nickname : fallbackProf.nickname;
+        const avatar = (data && data.avatar) || fallbackProf.avatar;
+        const user = getOrCreatePlayer(uid, nick, avatar);
         const count = (data && data.count) || 1;
         dealDamage(user, 15 * count, 'like');
     });
 
     socket.on('player_gift', (gift) => {
-        const uid = (gift && gift.uniqueId) || ('vip_' + Math.floor(Math.random() * 999));
-        const nick = (gift && gift.nickname) || 'Đại Gia Solo';
-        const user = getOrCreatePlayer(uid, nick, gift && gift.avatar);
+        const fallbackProf = getRandomVietTikTokProfile();
+        const uid = (gift && gift.uniqueId) || ('vip_' + Math.floor(1000 + Math.random() * 9000));
+        const nick = (gift && gift.nickname && !gift.nickname.startsWith('Thợ Săn #')) ? gift.nickname : fallbackProf.nickname;
+        const avatar = (gift && gift.avatar) || fallbackProf.avatar;
+        const user = getOrCreatePlayer(uid, nick, avatar);
         const diamonds = (gift && gift.diamonds) || 1;
         user.totalDiamonds += diamonds;
 
@@ -821,7 +893,8 @@ io.on('connection', (socket) => {
     });
 
     socket.on('admin_tap_attack', (count = 1) => {
-        const testUser = getOrCreatePlayer('test_hunter_1', 'Thợ Săn Solo (Test)', DEFAULT_AVATARS[0]);
+        const prof = getRandomVietTikTokProfile();
+        const testUser = getOrCreatePlayer(prof.id, prof.nickname, prof.avatar);
         dealDamage(testUser, 15 * count, 'like');
     });
 
@@ -856,10 +929,11 @@ io.on('connection', (socket) => {
     });
 
     socket.on('admin_mock_gift', (gift) => {
+        const fallbackProf = getRandomVietTikTokProfile();
         const testUser = getOrCreatePlayer(
-            'vip_' + Math.floor(Math.random() * 999),
-            gift.nickname || 'Đại Gia Solo',
-            gift.avatar || DEFAULT_AVATARS[1]
+            gift.uniqueId || ('vip_' + Math.floor(1000 + Math.random() * 9000)),
+            gift.nickname || fallbackProf.nickname,
+            gift.avatar || fallbackProf.avatar
         );
         const diamonds = gift.diamonds || 1;
         testUser.totalDiamonds += diamonds;
@@ -935,16 +1009,16 @@ io.on('connection', (socket) => {
 
     socket.on('admin_mock_10_hunters', () => {
         const MOCK_HUNTERS = [
-            { id: 'h1', name: 'Sung Jin-woo', exp: 620000, dmg: 350000, dia: 520, rank: 'QUỐC GIA', avatar: 'https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?w=150' },
-            { id: 'h2', name: 'Cha Hae-in', exp: 185000, dmg: 195000, dia: 120, rank: 'S', avatar: 'https://images.unsplash.com/photo-1494790108377-be9c29b29330?w=150' },
-            { id: 'h3', name: 'Choi Jong-in', exp: 142000, dmg: 140000, dia: 100, rank: 'S', avatar: 'https://images.unsplash.com/photo-1570295999919-56ceb5ecca61?w=150' },
-            { id: 'h4', name: 'Baek Yoon-ho', exp: 95000, dmg: 98000, dia: 80, rank: 'S', avatar: 'https://images.unsplash.com/photo-1527980965255-d3b416303d12?w=150' },
-            { id: 'h5', name: 'Go Gun-hee', exp: 76000, dmg: 75000, dia: 60, rank: 'S', avatar: 'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=150' },
-            { id: 'h6', name: 'Woo Jin-chul', exp: 46000, dmg: 52000, dia: 45, rank: 'A', avatar: 'https://images.unsplash.com/photo-1500648767791-00dcc994a43e?w=150' },
-            { id: 'h7', name: 'Yoo Jin-ho', exp: 32000, dmg: 36000, dia: 30, rank: 'A', avatar: 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=150' },
-            { id: 'h8', name: 'Song Chi-yul', exp: 18000, dmg: 21000, dia: 15, rank: 'B', avatar: 'https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?w=150' },
-            { id: 'h9', name: 'Lee Joo-hee', exp: 8500, dmg: 15000, dia: 8, rank: 'C', avatar: 'https://images.unsplash.com/photo-1544005313-94ddf0286df2?w=150' },
-            { id: 'h10', name: 'Kim Sang-shik', exp: 3200, dmg: 8500, dia: 2, rank: 'D', avatar: 'https://images.unsplash.com/photo-1519085360753-af0119f7cbe7?w=150' }
+            { id: 'vn_01', name: 'Nguyễn Hoàng Long', exp: 620000, dmg: 350000, dia: 520, rank: 'QUỐC GIA', avatar: 'https://images.unsplash.com/photo-1506794778202-cad84cf45f1d?w=150' },
+            { id: 'vn_11', name: 'Khánh Huyền ✨', exp: 185000, dmg: 195000, dia: 120, rank: 'S', avatar: 'https://images.unsplash.com/photo-1517841905240-472988babdf9?w=150' },
+            { id: 'vn_09', name: 'Duy Nến Gaming 🎮', exp: 142000, dmg: 140000, dia: 100, rank: 'S', avatar: 'https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?w=150' },
+            { id: 'vn_02', name: 'Minh Quân 2k4', exp: 95000, dmg: 98000, dia: 80, rank: 'S', avatar: 'https://images.unsplash.com/photo-1539571696357-5a69c17a67c6?w=150' },
+            { id: 'vn_12', name: 'Thuỳ Linh 2k3 🌸', exp: 76000, dmg: 75000, dia: 60, rank: 'S', avatar: 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=150' },
+            { id: 'vn_08', name: 'Boy Phố Hải Phòng 🏍️', exp: 46000, dmg: 52000, dia: 45, rank: 'A', avatar: 'https://images.unsplash.com/photo-1560250097-0b93528c311a?w=150' },
+            { id: 'vn_03', name: 'Lê Tuấn Anh', exp: 32000, dmg: 36000, dia: 30, rank: 'A', avatar: 'https://images.unsplash.com/photo-1492562080023-ab3db95bfbce?w=150' },
+            { id: 'vn_17', name: 'Bé Heo Dễ Thương 🐷', exp: 18000, dmg: 21000, dia: 15, rank: 'B', avatar: 'https://images.unsplash.com/photo-1548142813-c348350df52b?w=150' },
+            { id: 'vn_05', name: 'Phan Bảo Nam', exp: 8500, dmg: 15000, dia: 8, rank: 'C', avatar: 'https://images.unsplash.com/photo-1501196354995-cbb51c65aaea?w=150' },
+            { id: 'vn_13', name: 'Ngọc Ánh 🎀', exp: 3200, dmg: 8500, dia: 2, rank: 'D', avatar: 'https://images.unsplash.com/photo-1544005313-94ddf0286df2?w=150' }
         ];
 
         for (const m of MOCK_HUNTERS) {
@@ -958,40 +1032,39 @@ io.on('connection', (socket) => {
 
         updateLeaderboards();
         io.emit('leaderboard_updated', { topDps, topDonators, currentStage });
-        console.log('✅ Đã nạp danh sách 10 thợ săn hàng đầu');
+        console.log('✅ Đã nạp danh sách 10 thợ săn hàng đầu (Nick TikTok Việt thật 100%)');
     });
 
     socket.on('admin_mock_level_up', () => {
-        const mockLevels = [
-            { name: 'Sung Jin-woo', rank: 'QUỐC GIA', oldLvl: 99, newLvl: 100, avatar: 'https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?w=150', quote: 'Ma lực Hắc Ám Hoàng Đế bùng nổ đến đỉnh cao!' },
-            { name: 'Cha Hae-in', rank: 'S', oldLvl: 61, newLvl: 62, avatar: 'https://images.unsplash.com/photo-1494790108377-be9c29b29330?w=150', quote: 'Kiếm pháp Vũ Điệu Ánh Sáng đạt cảnh giới mới!' },
-            { name: 'Thợ Săn Mới', rank: 'A', oldLvl: 34, newLvl: 35, avatar: 'https://images.unsplash.com/photo-1570295999919-56ceb5ecca61?w=150', quote: 'Sức mạnh ma lực được khai mở vượt bậc!' }
-        ];
-        const chosen = mockLevels[Math.floor(Math.random() * mockLevels.length)];
-        const p = getOrCreatePlayer('mock_' + chosen.name, chosen.name, chosen.avatar);
-        p.level = chosen.newLvl;
-        p.rank = chosen.rank;
-        p.totalDamage += 25000;
+        const candidateProfiles = VIET_TIKTOK_PROFILES.slice(0, 10);
+        const chosen = candidateProfiles[Math.floor(Math.random() * candidateProfiles.length)];
+        const p = getOrCreatePlayer(chosen.id, chosen.nickname, chosen.avatar);
+        const oldLvl = p.level || 1;
+        const newLvl = oldLvl + 1;
+        p.level = newLvl;
+        p.exp += newLvl * 150;
+        p.rank = calculateRank(p.exp, p.totalDiamonds);
+        p.totalDamage += 15000;
         updateLeaderboards();
         io.emit('leaderboard_updated', { topDps, topDonators, currentStage });
 
         io.emit('hunter_level_up', {
             player: {
                 uniqueId: p.uniqueId,
-                nickname: chosen.name,
+                nickname: chosen.nickname,
                 avatar: chosen.avatar,
-                rank: chosen.rank,
-                level: chosen.newLvl
+                rank: p.rank,
+                level: p.level
             },
-            oldLevel: chosen.oldLvl,
-            newLevel: chosen.newLvl,
-            oldRank: chosen.rank,
-            newRank: chosen.rank,
+            oldLevel: oldLvl,
+            newLevel: newLvl,
+            oldRank: p.rank,
+            newRank: p.rank,
             isLevelUp: true,
             isRankUp: false,
-            quote: chosen.quote
+            quote: chosen.quote || 'Sức mạnh ma lực được khai mở vượt bậc!'
         });
-        console.log(`✨ Mock Level Up emitted for ${chosen.name}: Lv.${chosen.oldLvl} -> Lv.${chosen.newLvl}`);
+        console.log(`✨ Mock Level Up emitted cho ${chosen.nickname}: Lv.${oldLvl} -> Lv.${newLvl}`);
     });
 
     socket.on('admin_reset_all_hunters', () => {
