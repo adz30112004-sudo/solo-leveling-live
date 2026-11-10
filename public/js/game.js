@@ -133,10 +133,39 @@ const topHunterAvatar = document.getElementById('top-hunter-avatar');
 const topHunterName = document.getElementById('top-hunter-name');
 const topHunterDiamonds = document.getElementById('top-hunter-diamonds');
 
+// Elements cho hệ thống Nộ khí & Quái Đánh Trả
+const bossRagePct = document.getElementById('boss-rage-pct');
+const bossRageBarFill = document.getElementById('boss-rage-bar-fill');
+const hunterShieldPct = document.getElementById('hunter-shield-pct');
+const hunterShieldBarFill = document.getElementById('hunter-shield-bar-fill');
+const bossChargeAlert = document.getElementById('boss-charge-alert');
+const chargeSkillName = document.getElementById('charge-skill-name');
+const chargeSkillDesc = document.getElementById('charge-skill-desc');
+const chargeHitsText = document.getElementById('charge-hits-text');
+const chargeBreakFill = document.getElementById('charge-break-fill');
+const chargeTimerNum = document.getElementById('charge-timer-num');
+const bossAttackOverlay = document.getElementById('boss-attack-overlay');
+const attackImpactText = document.getElementById('attack-impact-text');
+const bossStunStars = document.getElementById('boss-stun-stars');
+const gameViewport = document.getElementById('game-viewport');
+
 function formatNumber(num) {
     if (num >= 1000000) return (num / 1000000).toFixed(1) + 'M';
     if (num >= 1000) return (num / 1000).toFixed(1) + 'K';
     return num.toLocaleString();
+}
+
+function updateRageAndShield(rage, shield) {
+    if (bossRagePct && bossRageBarFill && rage !== undefined) {
+        const r = Math.max(0, Math.min(100, Math.round(rage)));
+        bossRagePct.innerText = r + '%';
+        bossRageBarFill.style.width = r + '%';
+    }
+    if (hunterShieldPct && hunterShieldBarFill && shield !== undefined) {
+        const s = Math.max(0, Math.min(100, Math.round(shield)));
+        hunterShieldPct.innerText = s + '%';
+        hunterShieldBarFill.style.width = s + '%';
+    }
 }
 
 function updateHpBar(current, max) {
@@ -162,6 +191,14 @@ function updateStageInfo(stage, currentHp, maxHp) {
         vp.style.backgroundImage = `url('${stage.bgImage}')`;
     }
     updateHpBar(currentHp, maxHp);
+
+    updateRageAndShield(0, 100);
+    if (bossContainer) {
+        bossContainer.classList.remove('boss-charging', 'boss-counter-attack', 'boss-stunned');
+    }
+    if (bossChargeAlert) bossChargeAlert.classList.add('hidden');
+    if (bossStunStars) bossStunStars.classList.add('hidden');
+    if (bossAttackOverlay) bossAttackOverlay.classList.add('hidden');
 }
 
 function spawnDamageNumber(damage, type = 'normal', nickname = '') {
@@ -324,9 +361,112 @@ socket.on('init_game_state', (data) => {
     updateStageInfo(data.stage, data.bossCurrentHp, data.bossMaxHp);
     renderLeaderboards(data.topDps, data.topDonators);
     renderShadowArmy(data.shadowArmy);
+    updateRageAndShield(data.bossRage, data.hunterShield);
+    if (data.isBossCharging && bossChargeAlert) {
+        bossChargeAlert.classList.remove('hidden');
+        if (bossContainer) bossContainer.classList.add('boss-charging');
+    }
+    if (data.isBossStunned) {
+        if (bossContainer) bossContainer.classList.add('boss-stunned');
+        if (bossStunStars) bossStunStars.classList.remove('hidden');
+    }
     if (data.isBossDefeated) {
         victoryBanner.classList.remove('hidden');
     }
+});
+
+// Cập nhật Nộ khí & Khiên bảo vệ
+socket.on('boss_rage_updated', (data) => {
+    updateRageAndShield(data.bossRage, data.hunterShield);
+});
+
+socket.on('hunter_shield_updated', (data) => {
+    updateRageAndShield(undefined, data.hunterShield);
+});
+
+// Boss bắt đầu tụ chiêu thức
+socket.on('boss_charging_started', (data) => {
+    if (bossContainer) bossContainer.classList.add('boss-charging');
+    if (bossChargeAlert) {
+        bossChargeAlert.classList.remove('hidden');
+        if (chargeSkillName) chargeSkillName.innerText = (data.skillName || 'TUYỆT KỸ HỦY DIỆT').toUpperCase();
+        if (chargeSkillDesc) chargeSkillDesc.innerText = data.skillDesc || '';
+        if (chargeHitsText) chargeHitsText.innerText = `${data.remainingHits} HITS (Hoặc 1 Quà)`;
+        if (chargeBreakFill) chargeBreakFill.style.width = '100%';
+        if (chargeTimerNum) chargeTimerNum.innerText = data.countdown + 's';
+    }
+    playSound('thunder');
+});
+
+// Đếm ngược tụ chiêu
+socket.on('boss_charge_tick', (data) => {
+    if (chargeTimerNum) chargeTimerNum.innerText = data.countdown + 's';
+    if (chargeHitsText) chargeHitsText.innerText = `${data.remainingHits} HITS (Hoặc 1 Quà)`;
+});
+
+// Cập nhật số hit phá giáp
+socket.on('charge_hits_updated', (data) => {
+    if (chargeHitsText) chargeHitsText.innerText = `${data.remaining} HITS (Hoặc 1 Quà)`;
+    if (chargeBreakFill) chargeBreakFill.style.width = data.pct + '%';
+    playSlashSound(true);
+});
+
+// QUÁI ĐÁNH TRẢ (COUNTER-ATTACK)
+socket.on('boss_attack_triggered', (data) => {
+    if (bossChargeAlert) bossChargeAlert.classList.add('hidden');
+    if (bossContainer) {
+        bossContainer.classList.remove('boss-charging');
+        bossContainer.classList.add('boss-counter-attack');
+    }
+
+    // Rung lắc màn hình & hiệu ứng vết cào
+    if (gameViewport) {
+        gameViewport.classList.remove('screen-shake-heavy');
+        void gameViewport.offsetWidth;
+        gameViewport.classList.add('screen-shake-heavy');
+
+        // Màn hình chớp đỏ
+        const flash = document.createElement('div');
+        flash.className = 'screen-flash-red';
+        gameViewport.appendChild(flash);
+        setTimeout(() => flash.remove(), 600);
+    }
+
+    if (bossAttackOverlay) {
+        bossAttackOverlay.classList.remove('hidden');
+        if (attackImpactText) attackImpactText.innerText = `⚡ ${data.skillName.toUpperCase()}! ⚡`;
+    }
+
+    playSound('thunder');
+    updateRageAndShield(0, data.hunterShield);
+
+    setTimeout(() => {
+        if (bossContainer) bossContainer.classList.remove('boss-counter-attack');
+        if (bossAttackOverlay) bossAttackOverlay.classList.add('hidden');
+        if (gameViewport) gameViewport.classList.remove('screen-shake-heavy');
+    }, 1200);
+});
+
+// Boss bị phá chiêu / Choáng (Stunned)
+socket.on('boss_stunned', (data) => {
+    if (bossChargeAlert) bossChargeAlert.classList.add('hidden');
+    if (bossContainer) {
+        bossContainer.classList.remove('boss-charging', 'boss-counter-attack');
+        bossContainer.classList.add('boss-stunned');
+    }
+    if (bossStunStars) bossStunStars.classList.remove('hidden');
+
+    playSound('fanfare');
+    updateRageAndShield(0, undefined);
+
+    const breakerName = data.breaker ? `@${data.breaker.nickname}` : 'TỔ ĐỘI';
+    spawnDamageNumber(0, 'crit', `${breakerName} PHÁ CHIÊU STUN!`);
+});
+
+// Boss hết choáng
+socket.on('boss_recovered', () => {
+    if (bossContainer) bossContainer.classList.remove('boss-stunned');
+    if (bossStunStars) bossStunStars.classList.add('hidden');
 });
 
 socket.on('boss_damaged', (data) => {

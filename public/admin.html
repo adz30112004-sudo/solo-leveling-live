@@ -203,6 +203,45 @@
                 <div class="hp-bar-track">
                     <div id="mon-hp-bar" class="hp-bar-fill" style="width: 100%;"></div>
                 </div>
+
+                <!-- THANH NỘ KHÍ & KHIÊN TỔ ĐỘI TRÊN ADMIN -->
+                <div style="display: flex; justify-content: space-between; font-size: 11px; margin-top: 6px;">
+                    <span style="color: #fb923c; font-weight: 800;">🔥 Nộ Khí: <b id="mon-rage-text">0%</b></span>
+                    <span style="color: #38bdf8; font-weight: 800;">🛡️ Khiên Tổ Đội: <b id="mon-shield-text">100%</b></span>
+                </div>
+                <div style="display: flex; gap: 8px;">
+                    <div style="flex: 1; height: 8px; background: #2a1505; border-radius: 4px; overflow: hidden; border: 1px solid #f97316;">
+                        <div id="mon-rage-bar" style="height: 100%; width: 0%; background: linear-gradient(90deg, #f97316, #ef4444); transition: width 0.3s;"></div>
+                    </div>
+                    <div style="flex: 1; height: 8px; background: #081d33; border-radius: 4px; overflow: hidden; border: 1px solid #38bdf8;">
+                        <div id="mon-shield-bar" style="height: 100%; width: 100%; background: linear-gradient(90deg, #0284c7, #38bdf8); transition: width 0.3s;"></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- 1.5. ĐIỀU KHIỂN QUÁI ĐÁNH TRẢ & CUỒNG NỘ (BOSS COUNTER-ATTACK) -->
+        <div class="card" style="border: 1.5px solid #ef4444; background: #160a0f;">
+            <div class="card-title" style="color: #f87171;">
+                <span>🔥 Hệ Thống Quái Đánh Trả & Tuyệt Kỹ (Boss Counter-Attack)</span>
+                <span id="auto-rage-badge" style="font-size: 11px; background: #00ff88; color: #000; padding: 2px 8px; border-radius: 10px; font-weight: 800;">TỰ ĐỘNG: BẬT</span>
+            </div>
+            <div class="btn-grid">
+                <button class="btn-rose" onclick="addRage(25)" style="background: #ea580c;">
+                    ⚡ +25% Nộ Khí Boss
+                </button>
+                <button class="btn-danger" onclick="triggerCharge()" style="background: #dc2626; font-weight: 800;">
+                    ⚠️ Boss Tụ Tuyệt Kỹ (5s)
+                </button>
+                <button class="btn-danger" onclick="triggerAttack()" style="background: linear-gradient(135deg, #b91c1c, #7f1d1d); font-weight: 900;">
+                    💥 Quái Đánh Trả Ngay
+                </button>
+                <button class="btn-vip" onclick="stunBoss()" style="background: #eab308; color: #000;">
+                    💫 Phá Giáp Choáng Boss (x2 dmg)
+                </button>
+                <button class="btn-gate" id="btn-toggle-auto" onclick="toggleAutoRage()">
+                    🔄 Bật/Tắt Tự Động Nộ
+                </button>
             </div>
         </div>
 
@@ -314,13 +353,104 @@
 
         socket.on('init_game_state', (data) => {
             updateMonitor(data.stage, data.bossCurrentHp, data.bossMaxHp);
+            updateRageMonitor(data.bossRage, data.hunterShield);
+            updateAutoRageBadge(data.autoRageEnabled);
         });
 
         socket.on('boss_damaged', (data) => {
             updateMonitorHp(data.bossCurrentHp, data.bossMaxHp);
             const act = data.actionType === 'gift' ? `[QUÀ: ${data.giftName}]` : (data.actionType === 'like' ? '[THẢ TIM]' : '[CHAT]');
-            addLog(`⚔️ @${data.player.nickname} ${act} ➔ Gây -${data.damage.toLocaleString()} dmg (Boss còn: ${data.hpPercent}%)`, '#c084fc');
+            const critLabel = data.isCrit ? ' [CRIT x2 CHOÁNG!]' : '';
+            addLog(`⚔️ @${data.player.nickname} ${act}${critLabel} ➔ Gây -${data.damage.toLocaleString()} dmg (Boss còn: ${data.hpPercent}%)`, data.isCrit ? '#ffd700' : '#c084fc');
         });
+
+        socket.on('boss_rage_updated', (data) => {
+            updateRageMonitor(data.bossRage, data.hunterShield);
+        });
+
+        socket.on('hunter_shield_updated', (data) => {
+            updateRageMonitor(undefined, data.hunterShield);
+            if (data.recovered) {
+                addLog('🛡️ Khiên tổ đội thợ săn đã hồi phục 30%!', '#38bdf8');
+            }
+        });
+
+        socket.on('boss_charging_started', (data) => {
+            addLog(`⚠️ CẢNH BÁO: ĐẠI BOSS ĐANG TÍCH TỤ TUYỆT KỸ "${data.skillName.toUpperCase()}"! (${data.countdown}s)`, '#ef4444');
+        });
+
+        socket.on('boss_attack_triggered', (data) => {
+            updateRageMonitor(0, data.hunterShield);
+            addLog(`💥 BOSS ĐÃ TUNG RA SÁT CHIÊU: "${data.skillName.toUpperCase()}"! Trừ -${data.damageToShield}% Khiên tổ đội!`, '#ff0055');
+            if (data.isShieldBroken) {
+                addLog(`🚨 KHIÊN TỔ ĐỘI ĐÃ BỊ PHÁ VỠ! Thợ săn bị choáng 4s!`, '#ef4444');
+            }
+        });
+
+        socket.on('boss_stunned', (data) => {
+            updateRageMonitor(0, undefined);
+            const breaker = data.breaker ? `@${data.breaker.nickname}` : 'TỔ ĐỘI';
+            addLog(`💫 PHÁ GIÁP THÀNH CÔNG! ${breaker} ĐÃ GÂY CHOÁNG BOSS TRONG 5S (SÁT THƯƠNG x2)!`, '#00ff88');
+        });
+
+        socket.on('boss_recovered', () => {
+            addLog(`⚡ Boss đã hồi phục sau trạng thái choáng!`, '#e2e8f0');
+        });
+
+        socket.on('auto_rage_status', (data) => {
+            updateAutoRageBadge(data.autoRageEnabled);
+        });
+
+        function updateRageMonitor(rage, shield) {
+            if (rage !== undefined) {
+                const r = Math.max(0, Math.min(100, Math.round(rage)));
+                document.getElementById('mon-rage-text').innerText = r + '%';
+                document.getElementById('mon-rage-bar').style.width = r + '%';
+            }
+            if (shield !== undefined) {
+                const s = Math.max(0, Math.min(100, Math.round(shield)));
+                document.getElementById('mon-shield-text').innerText = s + '%';
+                document.getElementById('mon-shield-bar').style.width = s + '%';
+            }
+        }
+
+        let isAutoRage = true;
+        function updateAutoRageBadge(enabled) {
+            isAutoRage = !!enabled;
+            const badge = document.getElementById('auto-rage-badge');
+            if (badge) {
+                badge.style.background = isAutoRage ? '#00ff88' : '#ef4444';
+                badge.style.color = isAutoRage ? '#000' : '#fff';
+                badge.innerText = isAutoRage ? 'TỰ ĐỘNG: BẬT' : 'TỰ ĐỘNG: TẮT';
+            }
+        }
+
+        function addRage(amt = 25) {
+            socket.emit('admin_add_rage', amt);
+            addLog(`Đã gửi lệnh tăng +${amt}% nộ khí cho Boss`, '#fb923c');
+        }
+
+        function triggerCharge() {
+            socket.emit('admin_trigger_boss_charge');
+            addLog('Đã kích hoạt Boss bắt đầu tụ chiêu', '#ef4444');
+        }
+
+        function triggerAttack() {
+            socket.emit('admin_trigger_boss_attack');
+            addLog('Đã kích hoạt Quái tung sát chiêu ngay lập tức', '#ff0055');
+        }
+
+        function stunBoss() {
+            socket.emit('admin_stun_boss');
+            addLog('Đã kích hoạt phá giáp làm choáng Boss (x2 damage)', '#eab308');
+        }
+
+        function toggleAutoRage() {
+            isAutoRage = !isAutoRage;
+            socket.emit('admin_toggle_auto_rage', isAutoRage);
+            updateAutoRageBadge(isAutoRage);
+            addLog(`Đã ${isAutoRage ? 'BẬT' : 'TẮT'} chế độ tự động tích nộ cho Boss`, '#c084fc');
+        }
 
         socket.on('new_stage_started', (data) => {
             updateMonitor(data.stage, data.bossCurrentHp, data.bossMaxHp);

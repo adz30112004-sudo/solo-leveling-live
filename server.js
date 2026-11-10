@@ -27,6 +27,8 @@ const STAGES = [
         bossImage: '/assets/boss_goblin.png',
         bgImage: '/assets/bg_goblin.png',
         maxHp: 50000,
+        skillName: 'Mưa Tiễn Quỷ Độc',
+        skillDesc: 'Bắn vạn mũi tên tẩm kịch độc gây tê liệt toàn đội thợ săn!',
         themeColor: '#00ff88',
         bgGradient: 'radial-gradient(circle at 50% 35%, rgba(0, 255, 136, 0.15) 0%, rgba(10, 15, 20, 0.95) 75%)'
     },
@@ -39,6 +41,8 @@ const STAGES = [
         bossImage: '/assets/boss_baruka.png',
         bgImage: '/assets/bg_snow.png',
         maxHp: 200000,
+        skillName: 'Bão Băng Tuyệt Diệt',
+        skillDesc: 'Triệu hồi bão tuyết âm độ đóng băng và nứt toác mặt đất!',
         themeColor: '#00c6ff',
         bgGradient: 'radial-gradient(circle at 50% 35%, rgba(0, 198, 255, 0.2) 0%, rgba(10, 15, 30, 0.95) 75%)'
     },
@@ -51,6 +55,8 @@ const STAGES = [
         bossImage: '/assets/boss_baran.png',
         bgImage: '/assets/bg_demon.png',
         maxHp: 600000,
+        skillName: 'Thiên Lôi Địa Hỏa',
+        skillDesc: 'Gọi sấm sét đỏ rực và dung nham hỏa ngục giáng nát chiến trường!',
         themeColor: '#ff0055',
         bgGradient: 'radial-gradient(circle at 50% 35%, rgba(255, 0, 85, 0.25) 0%, rgba(25, 10, 15, 0.95) 75%)'
     },
@@ -63,6 +69,8 @@ const STAGES = [
         bossImage: '/assets/boss_beru.png',
         bgImage: '/assets/bg_jeju.png',
         maxHp: 1500000,
+        skillName: 'Trảm Hồn Liêm Tử Thần',
+        skillDesc: 'Vung song kiếm liêm bóng đêm chém toác không gian với tốc độ âm thanh!',
         themeColor: '#a855f7',
         bgGradient: 'radial-gradient(circle at 50% 35%, rgba(168, 85, 247, 0.3) 0%, rgba(15, 5, 25, 0.95) 75%)'
     },
@@ -75,6 +83,8 @@ const STAGES = [
         bossImage: '/assets/boss_statue.png',
         bgImage: '/assets/bg_temple.png',
         maxHp: 5000000,
+        skillName: 'Ma Nhãn Tia Hủy Diệt',
+        skillDesc: 'Phóng chùm laser chết chóc từ hai mắt thiêu rụi toàn bộ thợ săn!',
         themeColor: '#ef4444',
         bgGradient: 'radial-gradient(circle at 50% 35%, rgba(239, 68, 68, 0.35) 0%, rgba(20, 5, 5, 0.95) 75%)'
     }
@@ -88,6 +98,18 @@ let bossCurrentHp = STAGES[0].maxHp;
 let isBossDefeated = false;
 let lastHitter = null;
 let defeatCountdown = null;
+
+// HỆ THỐNG NỘ KHÍ & ĐẠI BOSS ĐÁNH LẠI (BOSS COUNTER-ATTACK)
+let bossRage = 0;                // 0 -> 100%
+let isBossCharging = false;       // Đang tụ chiêu thức cảnh báo đỏ
+let isBossStunned = false;        // Bị phá chiêu / Choáng nhận x2 damage
+let chargeRemainingHits = 50;     // Số hit cần gõ để phá chiêu
+let chargeMaxHits = 50;
+let chargeTimer = null;
+let chargeCountdown = 5;
+let stunTimer = null;
+let hunterShield = 100;           // Khiên bảo vệ tổ đội thợ săn: 0 -> 100%
+let autoRageEnabled = true;       // Tự động tích nộ định kỳ
 
 // Quản lý người chơi: uniqueId -> Player Object
 const players = new Map();
@@ -162,13 +184,170 @@ function updateLeaderboards() {
 }
 
 // ==========================================
-// 3. XỬ LÝ SÁT THƯƠNG & THĂNG CẤP
+// 3. XỬ LÝ NỘ KHÍ, SÁT THƯƠNG & PHẢN ĐÒN (BOSS COUNTER-ATTACK)
 // ==========================================
+function startBossCharge() {
+    if (isBossCharging || isBossStunned || isBossDefeated) return;
+    isBossCharging = true;
+    chargeRemainingHits = 50;
+    chargeMaxHits = 50;
+    chargeCountdown = 5;
+
+    const currentStage = STAGES[currentStageIndex];
+    io.emit('boss_charging_started', {
+        skillName: currentStage.skillName,
+        skillDesc: currentStage.skillDesc,
+        themeColor: currentStage.themeColor,
+        countdown: chargeCountdown,
+        remainingHits: chargeRemainingHits,
+        maxHits: chargeMaxHits
+    });
+
+    if (chargeTimer) clearInterval(chargeTimer);
+    chargeTimer = setInterval(() => {
+        chargeCountdown--;
+        io.emit('boss_charge_tick', {
+            countdown: chargeCountdown,
+            remainingHits: chargeRemainingHits
+        });
+        if (chargeCountdown <= 0) {
+            clearInterval(chargeTimer);
+            chargeTimer = null;
+            executeBossAttack();
+        }
+    }, 1000);
+}
+
+function executeBossAttack() {
+    if (chargeTimer) {
+        clearInterval(chargeTimer);
+        chargeTimer = null;
+    }
+    isBossCharging = false;
+    bossRage = 0;
+
+    const currentStage = STAGES[currentStageIndex];
+    hunterShield = Math.max(0, hunterShield - 40);
+
+    io.emit('boss_attack_triggered', {
+        stage: currentStage,
+        skillName: currentStage.skillName,
+        damageToShield: 40,
+        hunterShield,
+        isShieldBroken: hunterShield <= 0
+    });
+
+    // Nếu Khiên vỡ, sau 4s hồi lại 30%
+    if (hunterShield <= 0) {
+        setTimeout(() => {
+            if (hunterShield <= 0) {
+                hunterShield = 30;
+                io.emit('hunter_shield_updated', { hunterShield, recovered: true });
+            }
+        }, 4000);
+    }
+}
+
+function stunBoss(breakerPlayer = null) {
+    if (chargeTimer) {
+        clearInterval(chargeTimer);
+        chargeTimer = null;
+    }
+    isBossCharging = false;
+    isBossStunned = true;
+    bossRage = 0;
+
+    const currentStage = STAGES[currentStageIndex];
+    io.emit('boss_stunned', {
+        breaker: breakerPlayer ? {
+            nickname: breakerPlayer.nickname,
+            avatar: breakerPlayer.avatar,
+            rank: breakerPlayer.rank
+        } : null,
+        stage: currentStage,
+        duration: 5
+    });
+
+    if (stunTimer) clearTimeout(stunTimer);
+    stunTimer = setTimeout(() => {
+        isBossStunned = false;
+        io.emit('boss_recovered', {
+            stage: STAGES[currentStageIndex]
+        });
+    }, 5000);
+}
+
+function resetBossRageState() {
+    if (chargeTimer) {
+        clearInterval(chargeTimer);
+        chargeTimer = null;
+    }
+    if (stunTimer) {
+        clearTimeout(stunTimer);
+        stunTimer = null;
+    }
+    isBossCharging = false;
+    isBossStunned = false;
+    bossRage = 0;
+    chargeRemainingHits = 50;
+    hunterShield = 100;
+}
+
+// Tích nộ tự nhiên theo thời gian
+setInterval(() => {
+    if (autoRageEnabled && !isBossDefeated && !isBossCharging && !isBossStunned) {
+        bossRage = Math.min(100, bossRage + 2.5);
+        io.emit('boss_rage_updated', {
+            bossRage: Math.round(bossRage),
+            hunterShield
+        });
+        if (bossRage >= 100) {
+            startBossCharge();
+        }
+    }
+}, 1000);
+
 function dealDamage(player, rawDamage, actionType, giftData = null) {
     if (isBossDefeated) return null;
 
     const currentStage = STAGES[currentStageIndex];
     let damage = Math.max(1, Math.round(rawDamage));
+
+    // Đang Stun nhận x2 sát thương!
+    if (isBossStunned) {
+        damage = Math.round(damage * 2);
+    }
+
+    // Đang tụ chiêu thì trừ hit để phá giáp
+    if (isBossCharging) {
+        const hitsReduced = actionType === 'gift' ? 30 : (actionType === 'chat' ? 5 : 1);
+        chargeRemainingHits = Math.max(0, chargeRemainingHits - hitsReduced);
+        io.emit('charge_hits_updated', {
+            remaining: chargeRemainingHits,
+            max: chargeMaxHits,
+            pct: Math.round((chargeRemainingHits / chargeMaxHits) * 100)
+        });
+        if (chargeRemainingHits <= 0) {
+            stunBoss(player);
+        }
+    } else if (!isBossStunned && !isBossDefeated) {
+        // Tăng nộ khí khi bị đánh
+        const rageGain = actionType === 'gift' ? 6 : (actionType === 'chat' ? 1.5 : 0.4);
+        bossRage = Math.min(100, bossRage + rageGain);
+        io.emit('boss_rage_updated', {
+            bossRage: Math.round(bossRage),
+            hunterShield
+        });
+        if (bossRage >= 100) {
+            startBossCharge();
+        }
+    }
+
+    // Nếu tặng quà thì hồi phục khiên tổ đội
+    if (giftData && giftData.diamonds) {
+        hunterShield = Math.min(100, hunterShield + giftData.diamonds * 10);
+        io.emit('hunter_shield_updated', { hunterShield });
+    }
 
     // Trừ máu Boss
     bossCurrentHp = Math.max(0, bossCurrentHp - damage);
@@ -195,6 +374,7 @@ function dealDamage(player, rawDamage, actionType, giftData = null) {
             isShadowSoldier: player.isShadowSoldier
         },
         damage,
+        isCrit: isBossStunned,
         actionType,
         giftName: giftData ? giftData.giftName : null,
         giftIcon: giftData ? giftData.giftIcon : null,
@@ -220,6 +400,7 @@ function onBossDefeated(killer) {
     if (isBossDefeated) return;
     isBossDefeated = true;
     lastHitter = killer;
+    resetBossRageState();
 
     const currentStage = STAGES[currentStageIndex];
 
@@ -256,6 +437,7 @@ function goToNextStage() {
     bossCurrentHp = nextStage.maxHp;
     isBossDefeated = false;
     lastHitter = null;
+    resetBossRageState();
 
     // Reset sát thương vòng mới để mọi người cùng đua lại Top DPS
     for (const p of players.values()) {
@@ -283,6 +465,7 @@ function setCustomStage(stageIndex) {
         bossCurrentHp = s.maxHp;
         isBossDefeated = false;
         lastHitter = null;
+        resetBossRageState();
         for (const p of players.values()) {
             p.totalDamage = 0;
         }
@@ -454,12 +637,19 @@ io.on('connection', (socket) => {
         stage: currentStage,
         bossCurrentHp,
         bossMaxHp: currentStage.maxHp,
+        bossRage: Math.round(bossRage),
+        isBossCharging,
+        isBossStunned,
+        chargeRemainingHits,
+        chargeMaxHits,
+        hunterShield,
+        autoRageEnabled,
         isBossDefeated,
         lastHitter,
         topDps,
         topDonators,
         shadowArmy,
-        stagesList: STAGES.map(s => ({ id: s.id, name: s.name, rank: s.rank, maxHp: s.maxHp })),
+        stagesList: STAGES.map(s => ({ id: s.id, name: s.name, rank: s.rank, maxHp: s.maxHp, skillName: s.skillName })),
         tiktokStatus: {
             connected: isTikTokConnected,
             username: currentTikTokUsername
@@ -470,6 +660,36 @@ io.on('connection', (socket) => {
     socket.on('admin_tap_attack', (count = 1) => {
         const testUser = getOrCreatePlayer('test_hunter_1', 'Thợ Săn Solo (Test)', DEFAULT_AVATARS[0]);
         dealDamage(testUser, 15 * count, 'like');
+    });
+
+    // Admin Boss Counter-Attack & Rage controls
+    socket.on('admin_trigger_boss_charge', () => {
+        startBossCharge();
+    });
+
+    socket.on('admin_trigger_boss_attack', () => {
+        executeBossAttack();
+    });
+
+    socket.on('admin_stun_boss', () => {
+        const p = getOrCreatePlayer('admin_breaker', 'Quản Trị Viên (Admin)', DEFAULT_AVATARS[0]);
+        stunBoss(p);
+    });
+
+    socket.on('admin_add_rage', (amount = 25) => {
+        bossRage = Math.min(100, bossRage + amount);
+        io.emit('boss_rage_updated', {
+            bossRage: Math.round(bossRage),
+            hunterShield
+        });
+        if (bossRage >= 100) {
+            startBossCharge();
+        }
+    });
+
+    socket.on('admin_toggle_auto_rage', (val) => {
+        autoRageEnabled = (val !== undefined) ? val : !autoRageEnabled;
+        io.emit('auto_rage_status', { autoRageEnabled });
     });
 
     socket.on('admin_mock_gift', (gift) => {
@@ -521,10 +741,13 @@ io.on('connection', (socket) => {
         bossCurrentHp = s.maxHp;
         isBossDefeated = false;
         lastHitter = null;
+        resetBossRageState();
         io.emit('boss_reset', {
             stage: s,
             bossCurrentHp,
-            bossMaxHp: s.maxHp
+            bossMaxHp: s.maxHp,
+            bossRage: 0,
+            hunterShield: 100
         });
     });
 

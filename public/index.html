@@ -76,6 +76,28 @@
                     <div id="boss-hp-bar-delay" class="boss-hp-bar-delay" style="width: 100%;"></div>
                     <div id="boss-hp-bar-fill" class="boss-hp-bar-fill" style="width: 100%;"></div>
                 </div>
+
+                <!-- THANH NỘ KHÍ & KHIÊN TỔ ĐỘI THỢ SĂN -->
+                <div class="boss-rage-row">
+                    <div class="rage-label-group">
+                        <span class="rage-icon">🔥</span>
+                        <span class="rage-title">NỘ KHÍ:</span>
+                        <span id="boss-rage-pct" class="rage-pct">0%</span>
+                    </div>
+                    <div class="shield-label-group">
+                        <span class="shield-icon">🛡️</span>
+                        <span class="shield-title">KHIÊN TỔ ĐỘI:</span>
+                        <span id="hunter-shield-pct" class="shield-pct">100%</span>
+                    </div>
+                </div>
+                <div class="boss-dual-bars">
+                    <div class="rage-bar-track" title="Nộ khí Boss - 100% sẽ tích tụ tuyệt kỹ">
+                        <div id="boss-rage-bar-fill" class="rage-bar-fill" style="width: 0%;"></div>
+                    </div>
+                    <div class="shield-bar-track" title="Khiên bảo vệ tổ đội thợ săn">
+                        <div id="hunter-shield-bar-fill" class="shield-bar-fill" style="width: 100%;"></div>
+                    </div>
+                </div>
             </div>
         </div>
 
@@ -103,6 +125,41 @@
                 <img id="boss-sprite" class="boss-sprite" src="/assets/boss_beru.png" alt="Boss">
                 <!-- Vết chém chớp nhoáng trên Boss -->
                 <div class="slash-effect" id="slash-effect"></div>
+
+                <!-- HIỆU ỨNG BOSS BỊ CHOÁNG (STUNNED) -->
+                <div class="boss-stun-stars hidden" id="boss-stun-stars">
+                    <div class="stars-rotate">⭐💫⭐💫</div>
+                    <div class="stun-label">💥 BỊ CHOÁNG! x2 DAMAGE 💥</div>
+                </div>
+            </div>
+
+            <!-- CẢNH BÁO BOSS TỤ CHIÊU PHẢN ĐÒN (CHARGING WARNING) -->
+            <div id="boss-charge-alert" class="boss-charge-alert hidden">
+                <div class="charge-header">
+                    <span class="charge-siren">⚠️</span>
+                    <span class="charge-warning-text">BOSS ĐANG TÍCH TỤ TUYỆT KỸ!</span>
+                    <span class="charge-siren">⚠️</span>
+                </div>
+                <div id="charge-skill-name" class="charge-skill-name">TRẢM HỒN LIÊM TỬ THẦN</div>
+                <div id="charge-skill-desc" class="charge-skill-desc">Vung kiếm chém rách không gian!</div>
+                <div class="charge-progress-box">
+                    <div class="charge-break-info">
+                        <span>🚨 GÕ PHÁ GIÁP STUN:</span>
+                        <b id="charge-hits-text">50 HITS (Hoặc 1 Quà)</b>
+                    </div>
+                    <div class="charge-break-track">
+                        <div id="charge-break-fill" class="charge-break-fill" style="width: 100%;"></div>
+                    </div>
+                    <div class="charge-timer">Thời gian còn: <b id="charge-timer-num">5s</b></div>
+                </div>
+            </div>
+
+            <!-- HIỆU ỨNG QUÁI ĐÁNH TRẢ (COUNTER-ATTACK OVERLAY) -->
+            <div id="boss-attack-overlay" class="boss-attack-overlay hidden">
+                <div class="claw-scratch claw-1"></div>
+                <div class="claw-scratch claw-2"></div>
+                <div class="claw-scratch claw-3"></div>
+                <div class="attack-impact-text" id="attack-impact-text">⚡ QUÁI ĐÁNH TRẢ! ⚡</div>
             </div>
 
             <!-- CONTAINER SỐ DAMAGE BAY LÊN (FLOATING DAMAGE NUMBERS) -->
