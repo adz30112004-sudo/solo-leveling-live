@@ -43,19 +43,8 @@
             </div>
         </div>
 
-        <!-- 1. ĐỈNH MÀN HÌNH: ĐỆ NHẤT THỢ SĂN & CỔNG HẦM NGỤC -->
+        <!-- 1. ĐỈNH MÀN HÌNH: CỔNG HẦM NGỤC & ĐỒNG HỒ -->
         <div class="top-hud">
-            <!-- Đệ Nhất Thợ Săn (Top 1 Donate) -->
-            <div class="top-hunter-pill">
-                <div class="hunter-crown">👑</div>
-                <img id="top-hunter-avatar" class="hunter-avatar" src="https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?w=100" alt="Top 1">
-                <div class="hunter-info">
-                    <div class="hunter-label">👑 ĐỆ NHẤT THỢ SĂN</div>
-                    <div id="top-hunter-name" class="hunter-name">Chờ Đại Gia...</div>
-                </div>
-                <div id="top-hunter-diamonds" class="hunter-diamonds">0 💎</div>
-            </div>
-
             <!-- Tên Cổng Hầm Ngục & Cấp Độ & Đồng Hồ Đếm Giờ Đóng Cổng -->
             <div class="gate-header-row">
                 <div class="gate-badge-box">
@@ -236,81 +225,75 @@
             </div>
         </div>
 
-        <!-- 7. BỘ HÀNH ĐỘNG TẤN CÔNG & TẶNG QUÀ ĐÁY MÀN HÌNH -->
+        <!-- 7. BỘ HÀNH ĐỘNG TẤN CÔNG & TẶNG QUÀ ĐÁY MÀN HÌNH (VỪA KHÍT MÀN HÌNH 2 HÀNG) -->
         <div class="footer-skills-container">
             <div class="skills-bar-header">
-                <span>⚔️ THỢ SĂN TẤN CÔNG (GÕ MÀN HÌNH HOẶC CLICK VÀO QUÀ):</span>
+                <span>⚔️ GÕ MÀN HÌNH / BẤM QUÀ ĐỂ ĐÁNH BOSS:</span>
             </div>
-            <div class="footer-skills-bar">
-                <!-- 1. GÕ MÀN HÌNH CHÉM X1 -->
-                <div class="skill-pill tap" onclick="triggerTap(1)" title="Chém thường x1 (+15 dmg)">
-                    <div class="skill-icon">👆</div>
+            <div class="footer-skills-grid">
+                <!-- HÀNG 1: 4 MỤC -->
+                <div class="skill-pill tap" onclick="triggerTap(1)" title="Gõ màn hình / Chém x1 (+15 dmg)">
+                    <span class="skill-icon">👆</span>
                     <div class="skill-desc">
                         <span class="skill-name">Chém x1</span>
                         <span class="skill-dmg">+15 dmg</span>
                     </div>
                 </div>
 
-                <!-- 2. CHÉM X10 -->
                 <div class="skill-pill combo" onclick="triggerTap(10)" title="Chém liên hoàn x10 (+150 dmg)">
-                    <div class="skill-icon">⚡</div>
+                    <span class="skill-icon">⚡</span>
                     <div class="skill-desc">
                         <span class="skill-name">Chém x10</span>
                         <span class="skill-dmg">+150 dmg</span>
                     </div>
                 </div>
 
-                <!-- 3. HOA HỒNG (1 XU) -->
-                <div class="skill-pill rose" onclick="triggerGift('Hoa hồng', 1, '/assets/icons/tiktok_rose.png')" title="Hoa Hồng (1 xu)">
+                <div class="skill-pill rose" onclick="triggerGift('Hoa hồng', 1, '/assets/icons/tiktok_rose.png')" title="Hoa Hồng (1 xu / +500 dmg)">
                     <img class="skill-icon-img" src="/assets/icons/tiktok_rose.png" alt="Hoa Hồng">
                     <div class="skill-desc">
-                        <span class="skill-name">Hoa Hồng (1 xu)</span>
+                        <span class="skill-name">Hồng <b class="coin-num">1🪙</b></span>
                         <span class="skill-dmg">+500 dmg</span>
                     </div>
                 </div>
 
-                <!-- 4. BẮN TIM (5 XU) -->
-                <div class="skill-pill heart" onclick="triggerGift('Bắn tim', 5, '/assets/icons/tiktok_finger_heart.png')" title="Bắn Tim (5 xu)">
+                <div class="skill-pill heart" onclick="triggerGift('Bắn tim', 5, '/assets/icons/tiktok_finger_heart.png')" title="Bắn Tim (5 xu / +3.000 dmg)">
                     <img class="skill-icon-img" src="/assets/icons/tiktok_finger_heart.png" alt="Bắn Tim">
                     <div class="skill-desc">
-                        <span class="skill-name">Bắn Tim (5 xu)</span>
+                        <span class="skill-name">Tim <b class="coin-num">5🪙</b></span>
                         <span class="skill-dmg">+3.000 dmg</span>
                     </div>
                 </div>
 
-                <!-- 5. ROSA (10 XU) -->
-                <div class="skill-pill rosa" onclick="triggerGift('Rosa', 10, '/assets/icons/tiktok_rosa.png')" title="Rosa (10 xu)">
+                <!-- HÀNG 2: 4 MỤC -->
+                <div class="skill-pill rosa" onclick="triggerGift('Rosa', 10, '/assets/icons/tiktok_rosa.png')" title="Rosa (10 xu / +7.000 dmg)">
                     <img class="skill-icon-img" src="/assets/icons/tiktok_rosa.png" alt="Rosa">
                     <div class="skill-desc">
-                        <span class="skill-name">Rosa (10 xu)</span>
+                        <span class="skill-name">Rosa <b class="coin-num">10🪙</b></span>
                         <span class="skill-dmg">+7.000 dmg</span>
                     </div>
                 </div>
 
-                <!-- 6. NƯỚC HOA (20 XU) -->
-                <div class="skill-pill perfume" onclick="triggerGift('Nước hoa', 20, '/assets/icons/tiktok_perfume.png')" title="Nước Hoa (20 xu)">
+                <div class="skill-pill perfume" onclick="triggerGift('Nước hoa', 20, '/assets/icons/tiktok_perfume.png')" title="Nước Hoa (20 xu / +15.000 dmg)">
                     <img class="skill-icon-img" src="/assets/icons/tiktok_perfume.png" alt="Nước Hoa">
                     <div class="skill-desc">
-                        <span class="skill-name">Nước Hoa (20 xu)</span>
+                        <span class="skill-name">N.Hoa <b class="coin-num">20🪙</b></span>
                         <span class="skill-dmg">+15.000 dmg</span>
                     </div>
                 </div>
 
-                <!-- 7. HẠC GIẤY (99 XU - ARISE) -->
-                <div class="skill-pill arise" onclick="triggerGift('Hạc giấy', 99, '/assets/icons/tiktok_paper_crane.png')" title="Hạc Giấy (99 xu): Kích hoạt ARISE!">
+                <div class="skill-pill arise" onclick="triggerGift('Hạc giấy', 99, '/assets/icons/tiktok_paper_crane.png')" title="Hạc Giấy (99 xu / +100.000 dmg): Kích hoạt ARISE!">
                     <img class="skill-icon-img" src="/assets/icons/tiktok_paper_crane.png" alt="Hạc Giấy">
                     <div class="skill-desc">
-                        <span class="skill-name">Hạc Giấy (99 xu)</span>
-                        <span class="skill-dmg arise-highlight">🔥 ARISE! 100K</span>
+                        <span class="skill-name">Hạc <b class="coin-num-arise">99🪙</b></span>
+                        <span class="skill-dmg arise-highlight">ARISE 100K</span>
                     </div>
                 </div>
 
-                <!-- 8. XE THỂ THAO (500 XU) -->
-                <div class="skill-pill car" onclick="triggerGift('Xe Thể Thao', 500, '/assets/icons/tiktok_car.png')" title="Xe Thể Thao (500 xu): Hoàng Đế Giáng Lâm">
+                <div class="skill-pill car" onclick="triggerGift('Xe Thể Thao', 500, '/assets/icons/tiktok_car.png')" title="Xe Thể Thao (500 xu / +500.000 dmg): Hoàng Đế Giáng Lâm">
                     <img class="skill-icon-img" src="/assets/icons/tiktok_car.png" alt="Xe Thể Thao">
                     <div class="skill-desc">
-                        <span class="skill-name">Xe Đua (500 xu)</span>
-                        <span class="skill-dmg gold-highlight">👑 HOÀNG ĐẾ 500K</span>
+                        <span class="skill-name">Xe <b class="coin-num-gold">500🪙</b></span>
+                        <span class="skill-dmg gold-highlight">👑 500K</span>
                     </div>
                 </div>
             </div>

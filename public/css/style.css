@@ -258,10 +258,10 @@ body {
    ========================================= */
 .dps-board {
     position: absolute;
-    top: 172px;
+    top: 124px;
     left: 6px;
     width: 134px;
-    max-height: 295px;
+    max-height: 330px;
     overflow-y: auto;
     background: rgba(10, 15, 25, 0.9);
     backdrop-filter: blur(6px);
@@ -430,7 +430,7 @@ body {
 /* Shadow Army Board */
 .shadow-army-board {
     position: absolute;
-    top: 172px;
+    top: 124px;
     right: 6px;
     width: 108px;
     background: rgba(20, 10, 35, 0.88);
@@ -898,7 +898,7 @@ body {
    ========================================= */
 .footer-skills-container {
     position: absolute;
-    bottom: 8px;
+    bottom: 6px;
     left: 6px;
     width: calc(100% - 12px);
     z-index: 25;
@@ -909,80 +909,99 @@ body {
     font-weight: 800;
     color: #94a3b8;
     letter-spacing: 0.5px;
-    margin-bottom: 3px;
-    padding-left: 4px;
+    margin-bottom: 2px;
+    padding-left: 2px;
     text-shadow: 0 1px 3px rgba(0, 0, 0, 0.8);
-    display: flex;
-    justify-content: space-between;
 }
 
-.footer-skills-bar {
-    display: flex;
-    gap: 5px;
-    overflow-x: auto;
-    -webkit-overflow-scrolling: touch;
-    padding-bottom: 3px;
-    scrollbar-width: thin;
-}
-
-.footer-skills-bar::-webkit-scrollbar {
-    height: 3px;
-}
-.footer-skills-bar::-webkit-scrollbar-thumb {
-    background: rgba(0, 198, 255, 0.4);
-    border-radius: 3px;
+.footer-skills-grid {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    grid-template-rows: auto auto;
+    gap: 4px;
+    width: 100%;
 }
 
 .skill-pill {
-    flex: 0 0 76px;
-    background: rgba(10, 15, 25, 0.9);
-    backdrop-filter: blur(4px);
+    background: rgba(10, 15, 25, 0.92);
+    backdrop-filter: blur(5px);
     border: 1px solid rgba(255, 255, 255, 0.15);
-    border-radius: 8px;
-    padding: 5px 3px;
+    border-radius: 6px;
+    padding: 3.5px 4px;
     display: flex;
-    flex-direction: column;
     align-items: center;
-    justify-content: center;
-    gap: 2px;
-    text-align: center;
+    gap: 3.5px;
     cursor: pointer;
     user-select: none;
     transition: transform 0.1s ease, filter 0.1s ease, border-color 0.2s ease;
+    min-height: 31px;
+    box-sizing: border-box;
 }
 
 .skill-pill:hover {
-    filter: brightness(1.15);
+    filter: brightness(1.2);
     border-color: #38bdf8;
 }
 
 .skill-pill:active {
     transform: scale(0.92);
-    filter: brightness(1.3);
+    filter: brightness(1.35);
 }
 
-.skill-icon { font-size: 15px; line-height: 1; }
-.skill-icon-img { width: 18px; height: 18px; object-fit: contain; }
+.skill-icon {
+    font-size: 14px;
+    line-height: 1;
+    flex-shrink: 0;
+}
+
+.skill-icon-img {
+    width: 16px;
+    height: 16px;
+    object-fit: contain;
+    flex-shrink: 0;
+}
 
 .skill-desc {
     display: flex;
     flex-direction: column;
-    line-height: 1.1;
-    width: 100%;
+    min-width: 0;
+    flex: 1;
+    line-height: 1.05;
 }
 
 .skill-name {
-    font-size: 8px;
+    font-size: 7.5px;
     font-weight: 800;
     color: #fff;
     white-space: nowrap;
     overflow: hidden;
     text-overflow: ellipsis;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+}
+
+.coin-num {
+    font-size: 7px;
+    color: #ffd700;
+    font-weight: 900;
+}
+.coin-num-arise {
+    font-size: 7px;
+    color: #c084fc;
+    font-weight: 900;
+}
+.coin-num-gold {
+    font-size: 7px;
+    color: #f59e0b;
+    font-weight: 900;
 }
 
 .skill-dmg {
     font-size: 7px;
     font-weight: 700;
+    color: #94a3b8;
+}
     color: #94a3b8;
 }
 
