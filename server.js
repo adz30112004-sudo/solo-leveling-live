@@ -265,12 +265,12 @@ function updateLeaderboards() {
 // ==========================================
 // 3. XỬ LÝ NỘ KHÍ, SÁT THƯƠNG & PHẢN ĐÒN (BOSS COUNTER-ATTACK)
 // ==========================================
-function startBossCharge() {
+function startBossCharge(duration = 10) {
     if (isBossCharging || isBossStunned || isBossDefeated) return;
     isBossCharging = true;
     chargeRemainingHits = 50;
     chargeMaxHits = 50;
-    chargeCountdown = 5;
+    chargeCountdown = Math.max(3, duration);
 
     const currentStage = STAGES[currentStageIndex];
     io.emit('boss_charging_started', {
@@ -824,6 +824,7 @@ io.on('connection', (socket) => {
         isDungeonFailed,
         bossRage: Math.round(bossRage),
         isBossCharging,
+        chargeCountdown,
         isBossStunned,
         chargeRemainingHits,
         chargeMaxHits,
@@ -899,8 +900,8 @@ io.on('connection', (socket) => {
     });
 
     // Admin Boss Counter-Attack & Rage controls
-    socket.on('admin_trigger_boss_charge', () => {
-        startBossCharge();
+    socket.on('admin_trigger_boss_charge', (duration) => {
+        startBossCharge(duration);
     });
 
     socket.on('admin_trigger_boss_attack', () => {

@@ -132,45 +132,45 @@
                 </div>
             </div>
 
-            <!-- CẢNH BÁO BOSS TỤ CHIÊU PHẢN ĐÒN (CHARGING WARNING) -->
-            <div id="boss-charge-alert" class="boss-charge-alert hidden">
-                <div class="charge-header">
-                    <span class="charge-siren">⚠️</span>
-                    <span class="charge-warning-text">BOSS ĐANG TÍCH TỤ TUYỆT KỸ!</span>
-                    <span class="charge-siren">⚠️</span>
-                </div>
-                <div id="charge-skill-name" class="charge-skill-name">TRẢM HỒN LIÊM TỬ THẦN</div>
-                <div id="charge-skill-desc" class="charge-skill-desc">Vung kiếm chém rách không gian!</div>
-                <div class="charge-progress-box">
-                    <div class="charge-break-info">
-                        <span>🚨 GÕ PHÁ GIÁP STUN:</span>
-                        <b id="charge-hits-text">50 HITS (Hoặc 1 Quà)</b>
-                    </div>
-                    <div class="charge-break-track">
-                        <div id="charge-break-fill" class="charge-break-fill" style="width: 100%;"></div>
-                    </div>
-                    <div class="charge-timer">Thời gian còn: <b id="charge-timer-num">5s</b></div>
-                </div>
-            </div>
-
             <!-- CONTAINER SỐ DAMAGE BAY LÊN (FLOATING DAMAGE NUMBERS) -->
             <div id="damage-container" class="damage-container"></div>
+        </div>
 
-            <!-- BẢNG THÔNG BÁO BOSS BỊ HẠ GỤC -->
-            <div id="victory-banner" class="victory-banner hidden">
-                <div class="vic-title">🎉 HẦM NGỤC ĐÃ ĐƯỢC CHINH PHỤC! 🎉</div>
-                <div class="vic-killer" id="vic-killer">Đòn Kết Liễu: @Thợ Săn Hạng S</div>
-                <div class="vic-chest">🎁 RƯƠNG BÁU HOÀNG KIM ĐÃ MỞ! 🎁</div>
-                <div class="vic-next-gate" id="vic-next-gate">Cổng Tiếp Theo Mở Trong: <b>6s</b></div>
+        <!-- CẢNH BÁO BOSS TỤ CHIÊU PHẢN ĐÒN (CHARGING WARNING - NẰM ĐÈ LÊN MỌI BẢNG XẾP HẠNG & TOÀN MÀN HÌNH) -->
+        <div id="boss-charge-alert" class="boss-charge-alert hidden">
+            <div class="charge-header">
+                <span class="charge-siren">⚠️</span>
+                <span class="charge-warning-text">BOSS ĐANG TÍCH TỤ TUYỆT KỸ!</span>
+                <span class="charge-siren">⚠️</span>
             </div>
+            <div id="charge-skill-name" class="charge-skill-name">TRẢM HỒN LIÊM TỬ THẦN</div>
+            <div id="charge-skill-desc" class="charge-skill-desc">Vung kiếm chém rách không gian!</div>
+            <div class="charge-progress-box">
+                <div class="charge-break-info">
+                    <span>🚨 GÕ PHÁ GIÁP STUN:</span>
+                    <b id="charge-hits-text">50 HITS (Hoặc 1 Quà)</b>
+                </div>
+                <div class="charge-break-track">
+                    <div id="charge-break-fill" class="charge-break-fill" style="width: 100%;"></div>
+                </div>
+                <div class="charge-timer">Thời gian còn: <b id="charge-timer-num">5s</b></div>
+            </div>
+        </div>
 
-            <!-- BẢNG THÔNG BÁO HẾT GIỜ - THĂNG CẤP THẤT BẠI -->
-            <div id="defeat-banner" class="defeat-banner hidden">
-                <div class="defeat-skull">💀 CỔNG HẦM NGỤC ĐÃ ĐÓNG! 💀</div>
-                <div class="defeat-title">THĂNG CẤP THẤT BẠI</div>
-                <div class="defeat-desc">Hết thời gian! Quân đoàn thợ săn không kịp hạ gục Đại Boss!</div>
-                <div class="defeat-retry" id="defeat-retry-text">Tự Động Mở Lại Cổng Trong: <b>5s</b></div>
-            </div>
+        <!-- BẢNG THÔNG BÁO BOSS BỊ HẠ GỤC -->
+        <div id="victory-banner" class="victory-banner hidden">
+            <div class="vic-title">🎉 HẦM NGỤC ĐÃ ĐƯỢC CHINH PHỤC! 🎉</div>
+            <div class="vic-killer" id="vic-killer">Đòn Kết Liễu: @Thợ Săn Hạng S</div>
+            <div class="vic-chest">🎁 RƯƠNG BÁU HOÀNG KIM ĐÃ MỞ! 🎁</div>
+            <div class="vic-next-gate" id="vic-next-gate">Cổng Tiếp Theo Mở Trong: <b>6s</b></div>
+        </div>
+
+        <!-- BẢNG THÔNG BÁO HẾT GIỜ - THĂNG CẤP THẤT BẠI -->
+        <div id="defeat-banner" class="defeat-banner hidden">
+            <div class="defeat-skull">💀 CỔNG HẦM NGỤC ĐÃ ĐÓNG! 💀</div>
+            <div class="defeat-title">THĂNG CẤP THẤT BẠI</div>
+            <div class="defeat-desc">Hết thời gian! Quân đoàn thợ săn không kịp hạ gục Đại Boss!</div>
+            <div class="defeat-retry" id="defeat-retry-text">Tự Động Mở Lại Cổng Trong: <b>5s</b></div>
         </div>
 
         <!-- HIỆU ỨNG QUÁI ĐÁNH TRẢ TOÀN MÀN HÌNH (FULL VIEWPORT OVERLAY) -->

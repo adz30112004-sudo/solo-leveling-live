@@ -553,6 +553,11 @@ socket.on('init_game_state', (data) => {
     if (data.isBossCharging && bossChargeAlert) {
         bossChargeAlert.classList.remove('hidden');
         if (bossContainer) bossContainer.classList.add('boss-charging');
+        if (chargeSkillName && data.stage) chargeSkillName.innerText = (data.stage.skillName || 'TUYỆT KỸ HỦY DIỆT').toUpperCase();
+        if (chargeSkillDesc && data.stage) chargeSkillDesc.innerText = data.stage.skillDesc || 'Vung kiếm chém rách không gian!';
+        if (chargeHitsText) chargeHitsText.innerText = `${data.chargeRemainingHits || 50} HITS (Hoặc 1 Quà)`;
+        if (chargeBreakFill) chargeBreakFill.style.width = '100%';
+        if (chargeTimerNum) chargeTimerNum.innerText = (data.chargeCountdown || 10) + 's';
     }
     if (data.isBossStunned) {
         if (bossContainer) bossContainer.classList.add('boss-stunned');
