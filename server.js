@@ -181,17 +181,17 @@ function getOrCreatePlayer(uniqueId, nickname, avatar) {
 
 // Cập nhật bảng xếp hạng
 function updateLeaderboards() {
-    // Top 3 DPS
+    // Top 10 DPS (10 Thợ Săn Hàng Đầu)
     topDps = Array.from(players.values())
         .filter(p => p.totalDamage > 0)
         .sort((a, b) => b.totalDamage - a.totalDamage)
-        .slice(0, 3);
+        .slice(0, 10);
 
-    // Top 3 Đại gia (Đệ Nhất Thợ Săn)
+    // Top 10 Đại gia (Đệ Nhất Thợ Săn)
     topDonators = Array.from(players.values())
         .filter(p => p.totalDiamonds > 0)
         .sort((a, b) => b.totalDiamonds - a.totalDiamonds)
-        .slice(0, 3);
+        .slice(0, 10);
 }
 
 // ==========================================
@@ -872,6 +872,34 @@ io.on('connection', (socket) => {
 
     socket.on('admin_play_sound', (soundName) => {
         io.emit('play_sound_effect', soundName);
+    });
+
+    socket.on('admin_mock_10_hunters', () => {
+        const MOCK_HUNTERS = [
+            { id: 'h1', name: 'Sung Jin-woo', exp: 620000, dmg: 350000, dia: 520, rank: 'QUỐC GIA', avatar: 'https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?w=150' },
+            { id: 'h2', name: 'Cha Hae-in', exp: 185000, dmg: 195000, dia: 120, rank: 'S', avatar: 'https://images.unsplash.com/photo-1494790108377-be9c29b29330?w=150' },
+            { id: 'h3', name: 'Choi Jong-in', exp: 142000, dmg: 140000, dia: 100, rank: 'S', avatar: 'https://images.unsplash.com/photo-1570295999919-56ceb5ecca61?w=150' },
+            { id: 'h4', name: 'Baek Yoon-ho', exp: 95000, dmg: 98000, dia: 80, rank: 'S', avatar: 'https://images.unsplash.com/photo-1527980965255-d3b416303d12?w=150' },
+            { id: 'h5', name: 'Go Gun-hee', exp: 76000, dmg: 75000, dia: 60, rank: 'S', avatar: 'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=150' },
+            { id: 'h6', name: 'Woo Jin-chul', exp: 46000, dmg: 52000, dia: 45, rank: 'A', avatar: 'https://images.unsplash.com/photo-1500648767791-00dcc994a43e?w=150' },
+            { id: 'h7', name: 'Yoo Jin-ho', exp: 32000, dmg: 36000, dia: 30, rank: 'A', avatar: 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=150' },
+            { id: 'h8', name: 'Song Chi-yul', exp: 18000, dmg: 21000, dia: 15, rank: 'B', avatar: 'https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?w=150' },
+            { id: 'h9', name: 'Lee Joo-hee', exp: 8500, dmg: 15000, dia: 8, rank: 'C', avatar: 'https://images.unsplash.com/photo-1544005313-94ddf0286df2?w=150' },
+            { id: 'h10', name: 'Kim Sang-shik', exp: 3200, dmg: 8500, dia: 2, rank: 'D', avatar: 'https://images.unsplash.com/photo-1519085360753-af0119f7cbe7?w=150' }
+        ];
+
+        for (const m of MOCK_HUNTERS) {
+            const p = getOrCreatePlayer(m.id, m.name, m.avatar);
+            p.exp = m.exp;
+            p.level = calculateLevel(m.exp);
+            p.rank = m.rank;
+            p.totalDamage = m.dmg;
+            p.totalDiamonds = m.dia;
+        }
+
+        updateLeaderboards();
+        io.emit('leaderboard_updated', { topDps, topDonators, currentStage });
+        console.log('✅ Đã nạp danh sách 10 thợ săn hàng đầu');
     });
 
     socket.on('admin_connect_tiktok', (username) => {

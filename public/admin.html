@@ -303,6 +303,13 @@
                     🚗 Xe Thể Thao 500 xu: HOÀNG ĐẾ GIÁNG LÂM (500.000 dmg)
                 </button>
             </div>
+
+            <div style="font-size: 12px; font-weight: 700; color: #38bdf8; margin-top: 8px;">4. Bảng Xếp Hạng Top 10 Thợ Săn:</div>
+            <div class="btn-grid">
+                <button class="btn-gate" onclick="mock10Hunters()" style="background: #0c2738; border: 1.5px solid #0284c7; color: #7dd3fc; font-weight: 800;">
+                    👥 Giả Lập 10 Thợ Săn Hàng Đầu (Đủ Cấp Độ & Thứ Hạng)
+                </button>
+            </div>
         </div>
 
         <!-- 4. TEST ÂM THANH SOLO LEVELING (11 SFX SOUNDBOARD) -->
@@ -587,6 +594,11 @@
                 nickname,
                 giftIcon
             });
+        }
+
+        function mock10Hunters() {
+            socket.emit('admin_mock_10_hunters');
+            addLog('Đã nạp danh sách 10 thợ săn hàng đầu vào bảng xếp hạng', '#38bdf8');
         }
 
         function switchGate(idx) {

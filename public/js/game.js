@@ -345,20 +345,32 @@ function showNextToast() {
     }, 2800);
 }
 
-// Cập nhật Bảng xếp hạng
+// Cập nhật Bảng xếp hạng Top 10 Thợ Săn Hàng Đầu
 function renderLeaderboards(topDps, topDonators) {
     if (dpsListEl && topDps) {
         if (topDps.length === 0) {
             dpsListEl.innerHTML = '<div class="dps-item empty">Chưa có thợ săn...</div>';
         } else {
-            dpsListEl.innerHTML = topDps.map((p, idx) => `
-                <div class="dps-item">
-                    <span>${idx === 0 ? '🥇' : (idx === 1 ? '🥈' : '🥉')}</span>
-                    <img class="dps-item-avatar" src="${p.avatar}">
-                    <span class="dps-item-name">${p.nickname}</span>
-                    <span class="dps-item-pct">${formatNumber(p.totalDamage)}</span>
-                </div>
-            `).join('');
+            dpsListEl.innerHTML = topDps.slice(0, 10).map((p, idx) => {
+                const posHtml = idx === 0 ? '🥇' : (idx === 1 ? '🥈' : (idx === 2 ? '🥉' : `<span class="num-pos">${idx + 1}</span>`));
+                const rankText = p.rank || 'E';
+                const rankSlug = rankText.toLowerCase().replace(/\s+/g, '-');
+                const miniRank = rankText === 'QUỐC GIA' ? 'QG' : rankText;
+                return `
+                    <div class="dps-item ${idx < 3 ? 'top-three' : ''}">
+                        <div class="dps-item-pos">${posHtml}</div>
+                        <img class="dps-item-avatar ${idx === 0 ? 'gold-border' : ''}" src="${p.avatar}" alt="${p.nickname}">
+                        <div class="dps-item-info">
+                            <div class="dps-item-name" title="${p.nickname}">${p.nickname}</div>
+                            <div class="dps-item-level-tag">
+                                <span class="dps-item-level">Lv.${p.level || 1}</span>
+                                <span class="dps-rank-mini rank-${rankSlug}">${miniRank}</span>
+                            </div>
+                        </div>
+                        <span class="dps-item-pct">${formatNumber(p.totalDamage)}</span>
+                    </div>
+                `;
+            }).join('');
         }
     }
 

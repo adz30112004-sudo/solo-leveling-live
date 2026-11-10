@@ -258,31 +258,52 @@ body {
    ========================================= */
 .dps-board {
     position: absolute;
-    top: 148px;
-    left: 8px;
-    width: 110px;
-    background: rgba(10, 15, 25, 0.85);
-    border: 1px solid rgba(0, 198, 255, 0.4);
+    top: 172px;
+    left: 6px;
+    width: 134px;
+    max-height: 295px;
+    overflow-y: auto;
+    background: rgba(10, 15, 25, 0.9);
+    backdrop-filter: blur(6px);
+    border: 1px solid rgba(0, 198, 255, 0.45);
+    box-shadow: 0 4px 18px rgba(0, 0, 0, 0.65), inset 0 0 10px rgba(0, 198, 255, 0.08);
     border-radius: 8px;
-    padding: 6px;
+    padding: 5px 6px;
     z-index: 10;
     font-size: 9px;
 }
 
+.dps-board::-webkit-scrollbar {
+    width: 2px;
+}
+.dps-board::-webkit-scrollbar-thumb {
+    background: rgba(0, 198, 255, 0.35);
+    border-radius: 2px;
+}
+
 .dps-header {
-    font-size: 8.5px;
+    font-size: 8px;
     font-weight: 900;
     color: #00c6ff;
-    border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+    border-bottom: 1px solid rgba(255, 255, 255, 0.12);
     padding-bottom: 3px;
     margin-bottom: 4px;
-    letter-spacing: 0.4px;
+    letter-spacing: 0.3px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.dps-header-sub {
+    font-size: 7px;
+    color: #94a3b8;
+    font-weight: 800;
 }
 
 .dps-list {
     display: flex;
     flex-direction: column;
-    gap: 4px;
+    gap: 3px;
 }
 
 .dps-item {
@@ -290,6 +311,17 @@ body {
     align-items: center;
     gap: 4px;
     color: #fff;
+    padding: 1.5px 0;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.04);
+}
+
+.dps-item:last-child {
+    border-bottom: none;
+}
+
+.dps-item.top-three {
+    background: linear-gradient(90deg, rgba(255, 215, 0, 0.09), transparent);
+    border-radius: 4px;
 }
 
 .dps-item.empty {
@@ -298,39 +330,115 @@ body {
     font-size: 8px;
 }
 
+.dps-item-pos {
+    width: 14px;
+    text-align: center;
+    font-size: 9px;
+    flex-shrink: 0;
+    line-height: 1;
+}
+
+.num-pos {
+    display: inline-block;
+    font-size: 7.5px;
+    font-weight: 800;
+    color: #94a3b8;
+    background: rgba(255, 255, 255, 0.08);
+    padding: 1px 3px;
+    border-radius: 3px;
+}
+
 .dps-item-avatar {
     width: 18px;
     height: 18px;
     border-radius: 50%;
     border: 1px solid #00c6ff;
     object-fit: cover;
+    flex-shrink: 0;
+}
+
+.dps-item-avatar.gold-border {
+    border-color: #ffd700;
+    box-shadow: 0 0 5px rgba(255, 215, 0, 0.8);
+}
+
+.dps-item-info {
+    display: flex;
+    flex-direction: column;
+    min-width: 0;
+    flex: 1;
+    line-height: 1.1;
 }
 
 .dps-item-name {
-    font-size: 8.5px;
+    font-size: 8px;
     font-weight: 700;
-    max-width: 50px;
+    color: #f1f5f9;
     white-space: nowrap;
     overflow: hidden;
     text-overflow: ellipsis;
+    max-width: 52px;
+}
+
+.dps-item-level-tag {
+    display: flex;
+    align-items: center;
+    gap: 2.5px;
+}
+
+.dps-item-level {
+    font-size: 7px;
+    font-weight: 800;
+    color: #38bdf8;
+}
+
+.dps-rank-mini {
+    font-size: 6.5px;
+    font-weight: 800;
+    padding: 0 2.5px;
+    border-radius: 2px;
+    background: rgba(255, 255, 255, 0.1);
+    color: #cbd5e1;
+    line-height: 1.1;
+}
+
+.dps-rank-mini.rank-s, .dps-rank-mini.rank-quốc-gia {
+    background: rgba(255, 215, 0, 0.25);
+    color: #ffd700;
+    font-weight: 900;
+}
+
+.dps-rank-mini.rank-a, .dps-rank-mini.rank-b {
+    background: rgba(168, 85, 247, 0.25);
+    color: #c084fc;
+}
+
+.dps-rank-mini.rank-c, .dps-rank-mini.rank-d {
+    background: rgba(59, 130, 246, 0.2);
+    color: #60a5fa;
 }
 
 .dps-item-pct {
     margin-left: auto;
+    font-size: 8px;
     font-weight: 900;
     color: #ffd700;
+    flex-shrink: 0;
+    text-align: right;
 }
 
 /* Shadow Army Board */
 .shadow-army-board {
     position: absolute;
-    top: 148px;
-    right: 8px;
-    width: 110px;
-    background: rgba(20, 10, 35, 0.85);
+    top: 172px;
+    right: 6px;
+    width: 108px;
+    background: rgba(20, 10, 35, 0.88);
+    backdrop-filter: blur(6px);
     border: 1px solid rgba(168, 85, 247, 0.5);
+    box-shadow: 0 4px 18px rgba(0, 0, 0, 0.65), inset 0 0 10px rgba(168, 85, 247, 0.1);
     border-radius: 8px;
-    padding: 6px;
+    padding: 5px 6px;
     z-index: 10;
     font-size: 9px;
 }
