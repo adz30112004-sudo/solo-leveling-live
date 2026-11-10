@@ -1,0 +1,159 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Phố Đi Bộ Ghép Đôi — TikTok Live Interactive</title>
+    <link rel="stylesheet" href="/css/style.css?v=autofit_studio_1080">
+</head>
+<body>
+    <div id="game-viewport">
+        <script>
+            (function() {
+                function fit() {
+                    var vp = document.getElementById('game-viewport');
+                    if (!vp) return;
+                    var s = Math.min(window.innerWidth / 430, window.innerHeight / 764);
+                    vp.style.transform = 'scale(' + s + ')';
+                }
+                fit();
+                window.addEventListener('resize', fit);
+                window.addEventListener('DOMContentLoaded', fit);
+            })();
+        </script>
+        <!-- Lớp phủ ánh sáng ban đêm -->
+        <div class="overlay-gradient"></div>
+
+        <!-- Canvas pháo hoa Confetti -->
+        <canvas id="confetti-canvas" style="position: absolute; top:0; left:0; width:100%; height:100%; pointer-events:none; z-index:15;"></canvas>
+
+        <!-- 1. THANH ĐỆ NHẤT PHÚ HỘ (CĂN GIỮA ĐỈNH MÀN HÌNH) -->
+        <div class="top-phuho-bar">
+            <div class="leaderboard-row" id="top-leaderboard">
+                <div class="leader-card rank-1">
+                    <div class="leader-avatar-wrap">
+                        <span class="crown-badge">👑</span>
+                        <img class="leader-avatar" src="https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?w=100" alt="Top 1">
+                    </div>
+                    <div class="leader-info">
+                        <span class="leader-title">👑 ĐỆ NHẤT PHÚ HỘ 👑</span>
+                        <span class="leader-name">Chờ Đại Gia...</span>
+                        <span class="leader-diamonds">0 💎</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- 2. TOAST THÔNG BÁO DONATE QUÀ -->
+        <div id="gift-toast-container"></div>
+
+        <!-- 3. ĐÁM ĐÔNG PHÁI NAM BÊN TRÁI (ĐỨNG LỘN XỘN TỰ NHIÊN) -->
+        <div class="crowd-area crowd-male">
+            <div class="queue-badge queue-badge-male">PHÁI NAM 🌹</div>
+            <div class="crowd-field" id="male-queue-list"></div>
+        </div>
+
+        <!-- 4. ĐÁM ĐÔNG PHÁI NỮ BÊN PHẢI (ĐỨNG LỘN XỘN TỰ NHIÊN) -->
+        <div class="crowd-area crowd-female">
+            <div class="queue-badge queue-badge-female">PHÁI NỮ 🎵</div>
+            <div class="crowd-field" id="female-queue-list"></div>
+        </div>
+
+        <!-- 5. SÂN KHẤU TRÊN BỤC TRÁI TIM HỒ GƯƠM TRUNG TÂM -->
+        <div class="stage-container" id="stage-container">
+            <div class="empty-heart-stage-callout">
+                <div class="callout-pill-tag">💖 BỤC GHÉP ĐÔI HỒ GƯƠM 💖</div>
+                <div class="empty-stage-main-title">MỜI THAM GIA NAM HOẶC NỮ</div>
+                <div class="empty-stage-sub-title">ĐỂ BẮT ĐẦU GHÉP ĐÔI</div>
+
+                <div class="empty-stage-cta-row">
+                    <div class="stage-cta-pill male-cta">
+                        <img src="/assets/icons/tiktok_rose.png" class="stage-cta-icon" alt="Rose">
+                        <div class="stage-cta-text">
+                            <span class="cta-action">🌹 Hoa Hồng (1 xu)</span>
+                            <span class="cta-target">VÀO PHÁI NAM</span>
+                        </div>
+                    </div>
+
+                    <div class="stage-cta-heart">💘</div>
+
+                    <div class="stage-cta-pill female-cta">
+                        <img src="/assets/icons/tiktok_logo.png" class="stage-cta-icon" alt="TikTok">
+                        <div class="stage-cta-text">
+                            <span class="cta-action">🎵 TikTok (1 xu)</span>
+                            <span class="cta-target">VÀO PHÁI NỮ</span>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="empty-stage-bottom-hint">⚡ Đủ 1 Nam & 1 Nữ sẽ tự động bước lên bục ghép đôi! ⚡</div>
+            </div>
+        </div>
+
+        <!-- 6. BẢNG QUÀ CHÚC PHÚC & PHÁ DUYÊN (+ / - %) -->
+        <div class="gift-modifiers-container">
+            <!-- Nhóm Chúc Phúc (+%) -->
+            <div class="modifier-group bless-group">
+                <div class="modifier-group-title">💖 CHÚC PHÚC</div>
+                <div class="modifier-items">
+                    <div class="modifier-item" title="Bắn tim +1%">
+                        <img src="/assets/icons/tiktok_finger_heart.png" alt="Bắn tim">
+                        <span class="modifier-score bless">+1%</span>
+                    </div>
+                    <div class="modifier-item" title="Rosa +2%">
+                        <img src="/assets/icons/tiktok_rosa.png" alt="Rosa">
+                        <span class="modifier-score bless">+2%</span>
+                    </div>
+                    <div class="modifier-item" title="Little kisses +4%">
+                        <img src="/assets/icons/tiktok_kisses.png" alt="Little kisses">
+                        <span class="modifier-score bless">+4%</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Nhóm Phá Duyên (-%) -->
+            <div class="modifier-group curse-group">
+                <div class="modifier-group-title">💔 PHÁ DUYÊN</div>
+                <div class="modifier-items">
+                    <div class="modifier-item" title="OK 5 xu -1%">
+                        <img src="/assets/icons/tiktok_ok.png" alt="OK">
+                        <span class="modifier-score curse">-1%</span>
+                    </div>
+                    <div class="modifier-item" title="Chú Heo May Mắn 10 xu -2%">
+                        <img src="/assets/icons/tiktok_pig.png" alt="Chú Heo May Mắn">
+                        <span class="modifier-score curse">-2%</span>
+                    </div>
+                    <div class="modifier-item" title="Nước Hoa Perfume 20 xu -4%">
+                        <img src="/assets/icons/tiktok_perfume.png" alt="Nước Hoa">
+                        <span class="modifier-score curse">-4%</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- 7. HƯỚNG DẪN THAM GIA ĐÁY MÀN HÌNH (TIKTOK GIFT ICONS) -->
+        <div class="footer-cta-bar">
+            <div class="cta-step">
+                <img class="cta-gift-img" src="/assets/icons/tiktok_rose.png" alt="Rose">
+                <span class="cta-arrow">➔</span>
+                <span class="cta-gender-badge male">NAM</span>
+            </div>
+            <div class="cta-step">
+                <img class="cta-gift-img" src="/assets/icons/tiktok_logo.png" alt="TikTok">
+                <span class="cta-arrow">➔</span>
+                <span class="cta-gender-badge female">NỮ</span>
+            </div>
+            <div class="cta-step">
+                <img class="cta-gift-img" src="/assets/icons/tiktok_paper_crane.png" alt="Hạc Giấy 99 Xu">
+                <span class="cta-arrow">➔</span>
+                <span class="cta-gender-badge steal">CƯỚP BỒ</span>
+            </div>
+        </div>
+    </div>
+
+    <!-- Script kết nối Socket & Xử lý Game -->
+    <script src="/socket.io/socket.io.js"></script>
+    <script src="/js/game.js?v=autofit_studio_1080"></script>
+</body>
+</html>
+

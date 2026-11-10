@@ -1,0 +1,748 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Bảng Điều Khiển Test Game Live — Phố Đi Bộ Ghép Đôi</title>
+    <script src="https://cdn.socket.io/4.8.1/socket.io.min.js"></script>
+    <script>
+        if (typeof io === 'undefined') {
+            document.write('<script src="/socket.io/socket.io.js"><\/script>');
+        }
+    </script>
+    <style>
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+            background: #0f131a;
+            color: #fff;
+            padding: 20px;
+            margin: 0;
+        }
+
+        .container {
+            max-width: 860px;
+            margin: 0 auto;
+            display: flex;
+            flex-direction: column;
+            gap: 16px;
+        }
+
+        .header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-bottom: 1px solid #2d3748;
+            padding-bottom: 14px;
+        }
+
+        h1 { margin: 0; font-size: 20px; color: #fe2c55; }
+        
+        .card {
+            background: #1a202c;
+            border: 1px solid #2d3748;
+            border-radius: 12px;
+            padding: 16px;
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+        }
+
+        .card-title {
+            font-size: 14px;
+            font-weight: 800;
+            color: #e2e8f0;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .input-row {
+            display: flex;
+            gap: 10px;
+        }
+
+        input {
+            flex: 1;
+            padding: 10px 14px;
+            border-radius: 8px;
+            border: 1px solid #4a5568;
+            background: #2d3748;
+            color: #fff;
+            font-size: 14px;
+        }
+
+        button {
+            padding: 9px 16px;
+            border-radius: 8px;
+            border: none;
+            font-weight: 700;
+            font-size: 13px;
+            cursor: pointer;
+            transition: all 0.2s;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 6px;
+        }
+
+        button:hover { opacity: 0.9; transform: translateY(-1px); }
+        button:active { transform: translateY(0); }
+
+        .btn-tiktok { background: #fe2c55; color: white; }
+        .btn-boy { background: #0072ff; color: white; }
+        .btn-girl { background: #ff4b82; color: white; }
+        .btn-gift-small { background: #ff9800; color: white; }
+        .btn-gift-big { background: #e91e63; color: white; }
+        .btn-vip { background: #ffd700; color: #000; }
+        .btn-next { background: #4caf50; color: white; }
+        .btn-danger { background: #e53e3e; color: white; font-size: 11px; padding: 5px 10px; }
+
+        .btn-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+            gap: 10px;
+        }
+
+        /* Live Stage Monitor */
+        .stage-monitor {
+            background: #11151e;
+            border: 1.5px solid #ff4b82;
+            border-radius: 12px;
+            padding: 14px;
+            display: flex;
+            align-items: center;
+            justify-content: space-around;
+        }
+
+        .mon-couple {
+            display: flex;
+            align-items: center;
+            gap: 16px;
+        }
+
+        .mon-person {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 4px;
+        }
+
+        .mon-avatar {
+            width: 44px;
+            height: 44px;
+            border-radius: 50%;
+            object-fit: cover;
+        }
+
+        .mon-name {
+            font-size: 12px;
+            font-weight: 700;
+            max-width: 100px;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+        }
+
+        /* Queues Monitor */
+        .queues-row {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 12px;
+        }
+
+        .queue-box {
+            background: #11151e;
+            border-radius: 8px;
+            padding: 10px;
+            border: 1px solid #2d3748;
+        }
+
+        .queue-box-header {
+            font-size: 12px;
+            font-weight: 800;
+            margin-bottom: 8px;
+            display: flex;
+            justify-content: space-between;
+        }
+
+        .queue-chips {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 6px;
+            min-height: 32px;
+        }
+
+        .queue-chip {
+            font-size: 11px;
+            padding: 3px 8px;
+            border-radius: 12px;
+            background: #2d3748;
+            color: #fff;
+        }
+
+        .queue-chip.boy { border-left: 3px solid #00c6ff; }
+        .queue-chip.girl { border-left: 3px solid #ff4b82; }
+
+        .log-box {
+            background: #0f131a;
+            border: 1px solid #2d3748;
+            border-radius: 8px;
+            padding: 10px;
+            height: 140px;
+            overflow-y: auto;
+            font-family: monospace;
+            font-size: 11.5px;
+            color: #a0aec0;
+            display: flex;
+            flex-direction: column-reverse;
+        }
+
+        .log-item { margin-bottom: 3px; line-height: 1.4; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <!-- HEADER -->
+        <div class="header">
+            <div>
+                <h1>🎮 Bảng Điều Khiển Quản Trị Game Live</h1>
+                <div id="socket-status" style="font-size: 12px; color: #00ff88; margin-top: 4px;">
+                    🟢 Đang nhận diện máy chủ...
+                </div>
+            </div>
+            <a id="game-live-link" href="/" target="_blank" style="background: #25f4ee; color: #000; padding: 8px 14px; border-radius: 8px; font-size: 12px; text-decoration: none; font-weight: 800;">
+                ↗ Mở Màn Hình Game (OBS)
+            </a>
+        </div>
+
+        <!-- TARGET SERVER SELECTOR -->
+        <div class="card" style="background: #111827; border: 1.5px solid #3b82f6; padding: 12px 16px;">
+            <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 10px;">
+                <div>
+                    <div style="font-size: 13px; font-weight: 800; color: #60a5fa; display: flex; align-items: center; gap: 6px;">
+                        <span>🌐 Máy Chủ Game Đang Điều Khiển:</span>
+                        <span id="target-server-label" style="color: #00ff88; font-weight: 800;">(Đang tải...)</span>
+                    </div>
+                    <div style="font-size: 11px; color: #9ca3af; margin-top: 3px;">
+                        💡 Bạn có thể dán link Render của bạn vào đây để Admin này điều khiển thẳng vào phòng game trên mạng!
+                    </div>
+                </div>
+                <div style="display: flex; gap: 8px; flex: 1; max-width: 480px; min-width: 280px;">
+                    <input type="text" id="custom-server-url" placeholder="VD: https://ghepdoi-live.onrender.com" style="font-size: 12px; padding: 7px 12px;">
+                    <button class="btn-boy" onclick="switchServerUrl()" style="white-space: nowrap; font-size: 12px; padding: 7px 14px;">⚡ Kết Nối</button>
+                    <button class="btn-danger" onclick="resetServerUrl()" style="white-space: nowrap; font-size: 11px; padding: 7px 10px;" title="Khôi phục về cùng domain hiện tại">Mặc Định</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- 1. LIVE STAGE MONITOR (SÂN KHẤU TRỰC TIẾP) -->
+        <div class="card" style="border: 1.5px solid #ff4b82;">
+            <div class="card-title">
+                <span>❤️ Sân Khấu Ghép Đôi Hiện Tại</span>
+                <div style="display: flex; gap: 8px;">
+                    <button class="btn-next" onclick="triggerNextMatch()" style="font-size: 11px; padding: 4px 10px;">
+                        ⏩ Ép Cặp Tiếp Theo
+                    </button>
+                    <button class="btn-danger" onclick="clearMatch()">
+                        🔄 Xóa Khỏi Sàn
+                    </button>
+                </div>
+            </div>
+            <div class="stage-monitor" id="stage-monitor-box">
+                <div style="color: #718096; font-size: 13px;">Chưa có cặp đôi nào trên sân khấu</div>
+            </div>
+        </div>
+
+        <!-- 2. HÀNG ĐỢI NAM & NỮ HIỆN TẠI -->
+        <div class="card">
+            <div class="card-title">
+                <span>👥 Hàng Đợi Chờ Ghép Đôi</span>
+                <button class="btn-danger" onclick="clearQueue()">🗑️ Xóa Hết Hàng Đợi</button>
+            </div>
+            <div class="queues-row">
+                <div class="queue-box">
+                    <div class="queue-box-header" style="color: #00c6ff;">
+                        <span>Phái Nam</span>
+                        <span id="male-queue-count">0 bạn</span>
+                    </div>
+                    <div class="queue-chips" id="male-queue-chips">
+                        <span style="color: #4a5568; font-size: 11px;">Trống</span>
+                    </div>
+                </div>
+                <div class="queue-box">
+                    <div class="queue-box-header" style="color: #ff4b82;">
+                        <span>Phái Nữ</span>
+                        <span id="female-queue-count">0 bạn</span>
+                    </div>
+                    <div class="queue-chips" id="female-queue-chips">
+                        <span style="color: #4a5568; font-size: 11px;">Trống</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- 3. THÊM NGƯỜI CHƠI VÀO HÀNG ĐỢI (CUSTOM & QUICK) -->
+        <div class="card">
+            <div class="card-title">➕ Thêm Khán Giả Vào Hàng Đợi</div>
+            
+            <!-- Nhập tên tự do -->
+            <div class="input-row">
+                <input type="text" id="custom-username" placeholder="Nhập tên người chơi muốn thêm (VD: Huy, Linh, Trang)...">
+                <button class="btn-boy" onclick="addCustomUser('male')">Thêm Nam</button>
+                <button class="btn-girl" onclick="addCustomUser('female')">Thêm Nữ</button>
+            </div>
+
+            <!-- Nút bấm nhanh 1 chạm -->
+            <div style="font-size: 11.5px; color: #a0aec0; margin-top: 4px;">Hoặc bấm thêm nhanh:</div>
+            <div class="btn-grid">
+                <button class="btn-boy" onclick="mockJoin('Huy Boy Phố', 'male')">+ Nam (Huy)</button>
+                <button class="btn-boy" onclick="mockJoin('Tuấn Sát Thủ', 'male')">+ Nam (Tuấn)</button>
+                <button class="btn-girl" onclick="mockJoin('Linh Nàng Thơ', 'female')">+ Nữ (Linh)</button>
+                <button class="btn-girl" onclick="mockJoin('Trang Baby', 'female')">+ Nữ (Trang)</button>
+                <button class="btn-boy" onclick="addMultipleUsers('male', 5)" style="background: #0284c7; color: white;">👥 +5 Nam (Tụ tập đông)</button>
+                <button class="btn-girl" onclick="addMultipleUsers('female', 5)" style="background: #db2777; color: white;">👥 +5 Nữ (Tụ tập đông)</button>
+            </div>
+        </div>
+
+        <!-- 4. GIẢ LẬP DONATE QUÀ & CƯỚP BỒ -->
+        <div class="card">
+            <div class="card-title">🎁 Giả Lập Donate Quà TikTok Live</div>
+            
+            <div style="font-size: 11.5px; font-weight: 700; color: #ffd700;">1. Chọn Phái (1 Xu) & Cướp Bồ (99 Xu):</div>
+            <div class="btn-grid">
+                <button class="btn-boy" onclick="mockGift('Hoa Hồng', 1, 'Chàng Trai Hào Hoa', '/assets/icons/tiktok_rose.png')">
+                    <img src="/assets/icons/tiktok_rose.png" style="width: 22px; height: 22px;"> Tặng Hoa Hồng 1 xu (➔ Nam)
+                </button>
+                <button class="btn-girl" onclick="mockGift('TikTok', 1, 'Cô Gái Xinh Đẹp', '/assets/icons/tiktok_logo.png')">
+                    <img src="/assets/icons/tiktok_logo.png" style="width: 20px; height: 20px;"> Tặng TikTok 1 xu (➔ Nữ)
+                </button>
+                <button class="btn-vip" onclick="mockGift('Hạc Giấy', 99, 'Đại Gia Sài Gòn', '/assets/icons/tiktok_paper_crane.png')">
+                    <img src="/assets/icons/tiktok_paper_crane.png" style="width: 22px; height: 22px;"> Hạc Giấy 99 Xu (➔ CƯỚP BỒ!)
+                </button>
+            </div>
+
+            <div style="font-size: 11.5px; font-weight: 700; color: #ff4b82; margin-top: 6px;">2. Chúc Phúc (+ % Tình Duyên: 5 xu, 10 xu, 20 xu):</div>
+            <div class="btn-grid">
+                <button class="btn-gift-small" onclick="mockGift('Bắn tim', 5, 'Người Yêu Dấu', '/assets/icons/tiktok_finger_heart.png')" style="background: rgba(255, 75, 130, 0.3); border: 1px solid #ff4b82; color: #fff;">
+                    <img src="/assets/icons/tiktok_finger_heart.png" style="width: 20px; height: 20px;"> Bắn Tim 5 xu (+1%)
+                </button>
+                <button class="btn-gift-small" onclick="mockGift('Rosa', 10, 'Bạn Thân', '/assets/icons/tiktok_rosa.png')" style="background: rgba(255, 75, 130, 0.4); border: 1px solid #ff4b82; color: #fff;">
+                    <img src="/assets/icons/tiktok_rosa.png" style="width: 20px; height: 20px;"> Rosa 10 xu (+2%)
+                </button>
+                <button class="btn-gift-small" onclick="mockGift('Little kisses', 20, 'Hội Hóng Hớt', '/assets/icons/tiktok_kisses.png')" style="background: rgba(255, 75, 130, 0.55); border: 1px solid #ff4b82; color: #fff;">
+                    <img src="/assets/icons/tiktok_kisses.png" style="width: 20px; height: 20px;"> Little Kisses 20 xu (+4%)
+                </button>
+            </div>
+
+            <div style="font-size: 11.5px; font-weight: 700; color: #00c6ff; margin-top: 6px;">3. Phá Duyên (- % Tình Duyên: 5 xu, 10 xu, 20 xu):</div>
+            <div class="btn-grid">
+                <button class="btn-danger" onclick="mockGift('OK', 5, 'Khán Giả OK', '/assets/icons/tiktok_ok.png')" style="background: rgba(0, 198, 255, 0.25); border: 1px solid #00c6ff; color: #fff;">
+                    <img src="/assets/icons/tiktok_ok.png" style="width: 20px; height: 20px;"> OK 5 xu (-1%)
+                </button>
+                <button class="btn-danger" onclick="mockGift('Chú heo may mắn', 10, 'Heo Hóng Biến', '/assets/icons/tiktok_pig.png')" style="background: rgba(0, 198, 255, 0.4); border: 1px solid #00c6ff; color: #fff;">
+                    <img src="/assets/icons/tiktok_pig.png" style="width: 20px; height: 20px;"> Chú Heo May Mắn 10 xu (-2%)
+                </button>
+                <button class="btn-danger" onclick="mockGift('Perfume', 20, 'Hội Trà Xanh', '/assets/icons/tiktok_perfume.png')" style="background: rgba(255, 68, 68, 0.5); border: 1px solid #ff4444; color: #fff;">
+                    <img src="/assets/icons/tiktok_perfume.png" style="width: 20px; height: 20px;"> Nước Hoa 20 xu (-4%)
+                </button>
+            </div>
+        </div>
+
+        <!-- 5. KIỂM TRA & TEST ÂM THANH GAME -->
+        <div class="card">
+            <div class="card-title">
+                <span>🔊 Kiểm Tra Âm Thanh Game (Sound Effects & Nhạc Nền)</span>
+                <span style="font-size: 11px; color: #a0aec0;">Click để nghe thử trực tiếp trên loa máy</span>
+            </div>
+            <div class="btn-grid">
+                <button class="btn-gift-small" onclick="testSound('coin')">
+                    🔔 Tiếng Quà (Coin)
+                </button>
+                <button class="btn-boy" onclick="testSound('join')">
+                    🚶‍♂️ Tiếng Vào Hàng Đợi (Join)
+                </button>
+                <button class="btn-next" onclick="testSound('fanfare')">
+                    🎺 Tiếng Ghép Đôi (Fanfare)
+                </button>
+                <button class="btn-danger" onclick="testSound('steal_1')">
+                    ⚡ Cướp Bồ 1 (Úi dồi ôi!)
+                </button>
+                <button class="btn-danger" onclick="testSound('steal_2')" style="background: #c53030;">
+                    🚨 Cướp Bồ 2 (Alo Cảnh Sát!)
+                </button>
+                <button class="btn-vip" onclick="testSound('success_8386')">
+                    👑 Chúc 8 3 8 6 MÃI ĐỈNH!
+                </button>
+                <button class="btn-vip" onclick="toggleAdminBgm()" style="background: #9c27b0; color: white;">
+                    🎵 Bật/Tắt Nhạc Nền (BGM Loop)
+                </button>
+            </div>
+            <div style="font-size: 11px; color: #718096; margin-top: 2px;">
+                💡 <i>Âm thanh phát ngay trên loa Admin đồng thời gửi lệnh phát trực tiếp lên màn hình Game Live (<a href="/" target="_blank" style="color: #63b3ed;">http://localhost:3000</a>)</i>
+            </div>
+        </div>
+
+        <!-- 6. KẾT NỐI TIKTOK LIVE THẬT (TRỰC TIẾP MIỄN PHÍ) -->
+        <div class="card" style="border: 1.5px solid #00f2fe;">
+            <div class="card-title">
+                <span>📡 Kết Nối TikTok Live Thật (Trực Tiếp Miễn Phí 100%)</span>
+                <span id="connection-badge" style="font-size: 11px; background: rgba(255,255,255,0.1); padding: 3px 10px; border-radius: 12px; color: #a0aec0;">Chưa kết nối</span>
+            </div>
+            
+            <div class="input-row">
+                <input type="text" id="tiktok-user" placeholder="Nhập TikTok Username đang phát Live (VD: @linh_official hoặc linh_official)...">
+                <button class="btn-tiktok" onclick="connectTikTok()">⚡ Kết Nối Live Thật</button>
+                <button class="btn-danger" onclick="disconnectTikTok()" style="padding: 9px 14px;">Ngắt Kết Nối</button>
+            </div>
+
+            <div id="connection-status" style="font-size: 12px; color: #a0aec0; margin-top: 4px; line-height: 1.4;">
+                💡 <b>1 Chạm Là Kết Nối:</b> Chỉ cần nhập Username của kênh <b>đang phát trực tiếp (Live)</b> và bấm <b>Kết Nối Live Thật</b>. Hệ thống kết nối trực tiếp đến máy chủ TikTok, <b>không cần API key, không đăng ký tài khoản thứ ba, hoàn toàn miễn phí 100%</b>!
+            </div>
+        </div>
+
+        <!-- 7. LOG NHẬT KÝ SỰ KIỆN -->
+        <div class="card">
+            <div class="card-title">📝 Nhật Ký Hoạt Động</div>
+            <div class="log-box" id="log-box"></div>
+        </div>
+    </div>
+
+    <script>
+        let targetServer = localStorage.getItem('tiktok_game_server_url');
+        if (!targetServer) {
+            targetServer = (window.location.protocol === 'file:') ? 'http://localhost:3000' : window.location.origin;
+        }
+
+        const customUrlInput = document.getElementById('custom-server-url');
+        if (customUrlInput && localStorage.getItem('tiktok_game_server_url')) {
+            customUrlInput.value = localStorage.getItem('tiktok_game_server_url');
+        }
+
+        const targetServerLabel = document.getElementById('target-server-label');
+        if (targetServerLabel) {
+            targetServerLabel.innerText = targetServer;
+        }
+
+        const gameLiveLink = document.getElementById('game-live-link');
+        if (gameLiveLink) {
+            gameLiveLink.href = targetServer;
+        }
+
+        const socket = io(targetServer, {
+            transports: ['websocket', 'polling'],
+            reconnectionAttempts: 15
+        });
+
+        function switchServerUrl() {
+            let val = document.getElementById('custom-server-url').value.trim();
+            if (!val) {
+                alert('Vui lòng nhập link máy chủ game (VD: https://ghepdoi-live.onrender.com)');
+                return;
+            }
+            if (!val.startsWith('http://') && !val.startsWith('https://')) {
+                val = 'https://' + val;
+            }
+            val = val.replace(/\/+$/, '');
+            localStorage.setItem('tiktok_game_server_url', val);
+            addLog(`Đang chuyển hướng kết nối tới: ${val}`, '#ffd700');
+            window.location.reload();
+        }
+
+        function resetServerUrl() {
+            localStorage.removeItem('tiktok_game_server_url');
+            window.location.reload();
+        }
+
+        const logBox = document.getElementById('log-box');
+        const connStatus = document.getElementById('connection-status');
+        const stageMonitorBox = document.getElementById('stage-monitor-box');
+        const maleQueueChips = document.getElementById('male-queue-chips');
+        const femaleQueueChips = document.getElementById('female-queue-chips');
+        const maleQueueCount = document.getElementById('male-queue-count');
+        const femaleQueueCount = document.getElementById('female-queue-count');
+
+        function addLog(msg, color = '#a0aec0') {
+            const div = document.createElement('div');
+            div.className = 'log-item';
+            div.style.color = color;
+            div.innerText = `[${new Date().toLocaleTimeString()}] ${msg}`;
+            logBox.prepend(div);
+        }
+
+        socket.on('connect', () => {
+            const statusEl = document.getElementById('socket-status');
+            if (statusEl) {
+                statusEl.innerHTML = `🟢 Đã kết nối thành công tới: <b style="color:#00ff88;">${targetServer}</b>`;
+            }
+            addLog(`Đã kết nối Socket tới Game Server: ${targetServer}`, '#00ff88');
+        });
+
+        socket.on('connect_error', (err) => {
+            const statusEl = document.getElementById('socket-status');
+            if (statusEl) {
+                statusEl.innerHTML = `🔴 Lỗi kết nối tới: <b>${targetServer}</b> (${err.message || 'Kiểm tra đường truyền'})`;
+            }
+            addLog(`Lỗi kết nối Socket tới ${targetServer}: ${err.message}`, '#ff4444');
+        });
+
+        socket.on('disconnect', () => {
+            document.getElementById('socket-status').innerHTML = `🔴 Mất kết nối tới: ${targetServer}`;
+            addLog(`Mất kết nối với Game Server (${targetServer})!`, '#ff4444');
+        });
+
+        // Nhận trạng thái ban đầu
+        socket.on('init_state', data => {
+            updateQueueDisplay(data.maleQueue, data.femaleQueue);
+            updateStageDisplay(data.currentMatch);
+        });
+
+        socket.on('queue_updated', data => {
+            updateQueueDisplay(data.maleQueue, data.femaleQueue);
+        });
+
+        socket.on('new_match_started', m => {
+            updateStageDisplay(m);
+            addLog(`⚡ Cặp đôi lên sàn: ${m.male.nickname} 💖 ${m.female.nickname} (${m.percentage}%)`, '#ffd700');
+        });
+
+        socket.on('match_status_changed', m => {
+            updateStageDisplay(m);
+        });
+
+        socket.on('match_countdown', countdown => {
+            const el = document.getElementById('stage-countdown-val');
+            if (el) el.innerText = `${countdown}s`;
+        });
+
+        socket.on('match_updated', data => {
+            if (data.match) {
+                updateStageDisplay(data.match);
+            }
+            const sign = data.delta > 0 ? `+${data.delta}%` : `${data.delta}%`;
+            addLog(`🎁 [${data.donator}] tặng "${data.giftName}" ➔ Tỉ lệ: ${data.percentage}% (${sign})`, data.delta > 0 ? '#ff4b82' : '#00c6ff');
+        });
+
+        socket.on('partner_stolen', d => {
+            updateStageDisplay(d.match);
+            addLog(`🚨 DRAMA CƯỚP BỒ: [${d.thief.nickname}] vừa cướp bồ của [${d.victim.nickname}]!`, '#ff0844');
+        });
+
+        socket.on('match_cleared', () => {
+            updateStageDisplay(null);
+            addLog('Sân khấu đã được dọn sạch.', '#a0aec0');
+        });
+
+        socket.on('new_gift', g => {
+            addLog(`🎁 ${g.nickname} vừa tặng ${g.giftName} (${g.diamonds} xu)!`, '#25f4ee');
+        });
+
+        function updateQueueDisplay(males, females) {
+            maleQueueCount.innerText = `${males.length} bạn`;
+            femaleQueueCount.innerText = `${females.length} bạn`;
+
+            maleQueueChips.innerHTML = males.length > 0
+                ? males.map(m => `<span class="queue-chip boy">${m.nickname}</span>`).join('')
+                : '<span style="color: #4a5568; font-size: 11px;">Trống</span>';
+
+            femaleQueueChips.innerHTML = females.length > 0
+                ? females.map(f => `<span class="queue-chip girl">${f.nickname}</span>`).join('')
+                : '<span style="color: #4a5568; font-size: 11px;">Trống</span>';
+        }
+
+        function updateStageDisplay(match) {
+            if (!match) {
+                stageMonitorBox.innerHTML = `<div style="color: #718096; font-size: 13px;">Chưa có cặp đôi nào trên sân khấu</div>`;
+                return;
+            }
+
+            stageMonitorBox.innerHTML = `
+                <div class="mon-couple">
+                    <div class="mon-person">
+                        <img class="mon-avatar" style="border: 2px solid #00c6ff;" src="${match.male.avatar}">
+                        <span class="mon-name" style="color: #00c6ff;">${match.male.nickname}</span>
+                    </div>
+
+                    <div style="text-align: center;">
+                        <div style="font-size: 22px;">💖</div>
+                        <div style="font-size: 13px; font-weight: 800; color: #ff4b82;">${match.percentage}% Hợp</div>
+                        <div id="stage-countdown-val" style="font-size: 11px; background: #ff5722; padding: 2px 8px; border-radius: 10px; margin-top: 4px; font-weight: 800;">
+                            ${match.countdown || 60}s
+                        </div>
+                    </div>
+
+                    <div class="mon-person">
+                        <img class="mon-avatar" style="border: 2px solid #ff4b82;" src="${match.female.avatar}">
+                        <span class="mon-name" style="color: #ff4b82;">${match.female.nickname}</span>
+                    </div>
+                </div>
+            `;
+        }
+
+        const maleAvatars = [
+            'https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?w=150',
+            'https://images.unsplash.com/photo-1570295999919-56ceb5ecca61?w=150',
+            'https://images.unsplash.com/photo-1527980965255-d3b416303d12?w=150'
+        ];
+
+        const femaleAvatars = [
+            'https://images.unsplash.com/photo-1494790108377-be9c29b29330?w=150',
+            'https://images.unsplash.com/photo-1438761681033-6461ffad8d80?w=150',
+            'https://images.unsplash.com/photo-1544005313-94ddf0286df2?w=150'
+        ];
+
+        function mockJoin(name, gender) {
+            const avatars = gender === 'male' ? maleAvatars : femaleAvatars;
+            const avatar = avatars[Math.floor(Math.random() * avatars.length)];
+            socket.emit('admin_simulate_join', {
+                nickname: name,
+                gender: gender,
+                avatar: avatar
+            });
+            // Phát âm thanh join ngay tại màn hình Admin
+            new Audio('/assets/sounds/join.wav').play().catch(() => {});
+            addLog(`Đã gửi yêu cầu thêm [${name}] vào hàng đợi ${gender === 'male' ? 'Nam' : 'Nữ'}`);
+        }
+
+        function addCustomUser(gender) {
+            const input = document.getElementById('custom-username');
+            const name = input.value.trim() || (gender === 'male' ? 'Bạn Nam' : 'Bạn Nữ');
+            mockJoin(name, gender);
+            input.value = '';
+        }
+
+        function addMultipleUsers(gender, count) {
+            const maleNames = ['Huy Boy Phố', 'Tuấn Sát Thủ', 'Đạt Villa', 'Hoàng Tử Gió', 'Minh Công Tử', 'Duy Rich Kid', 'Bảo Hào Hoa', 'Quang Hải', 'Tiến Dũng', 'Văn Hậu'];
+            const femaleNames = ['Linh Nàng Thơ', 'Trang Baby', 'Mai Công Chúa', 'Hương Trà Xanh', 'Thảo Búp Bê', 'Ngọc Mỹ Nhân', 'Yến Xinh Gái', 'Hà Mi', 'Phương Ly', 'Chi Pu'];
+            const names = gender === 'male' ? maleNames : femaleNames;
+            for (let i = 0; i < count; i++) {
+                const name = names[Math.floor(Math.random() * names.length)] + ' ' + Math.floor(Math.random() * 90 + 10);
+                setTimeout(() => {
+                    mockJoin(name, gender);
+                }, i * 150);
+            }
+        }
+
+        function mockGift(giftName, diamonds, nickname, giftIcon = '') {
+            socket.emit('admin_simulate_gift', {
+                nickname: nickname,
+                giftName: giftName,
+                diamonds: diamonds,
+                giftIcon: giftIcon,
+                avatar: 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=150'
+            });
+            // Phát âm thanh quà hoặc sấm sét + giọng cướp bồ ngay tại Admin
+            if (diamonds >= 99) {
+                new Audio('/assets/sounds/thunder.wav').play().catch(() => {});
+                setTimeout(() => {
+                    const stealVoice = Math.random() > 0.5 ? '/assets/sounds/steal_1.wav' : '/assets/sounds/steal_2.wav';
+                    new Audio(stealVoice).play().catch(() => {});
+                }, 450);
+            } else {
+                new Audio('/assets/sounds/coin.wav').play().catch(() => {});
+            }
+        }
+
+        function triggerNextMatch() {
+            socket.emit('admin_trigger_next');
+            new Audio('/assets/sounds/fanfare.wav').play().catch(() => {});
+        }
+
+        function clearQueue() {
+            socket.emit('admin_clear_queue');
+        }
+
+        function clearMatch() {
+            socket.emit('admin_clear_match');
+        }
+
+        let adminBgmAudio = null;
+        let adminBgmPlaying = false;
+
+        function toggleAdminBgm() {
+            if (!adminBgmAudio) {
+                adminBgmAudio = new Audio('/assets/sounds/bgm.wav');
+                adminBgmAudio.loop = true;
+                adminBgmAudio.volume = 0.35;
+            }
+            adminBgmPlaying = !adminBgmPlaying;
+            if (adminBgmPlaying) {
+                adminBgmAudio.play().catch(() => {});
+                socket.emit('admin_toggle_bgm', true);
+                addLog('Đã BẬT nhạc nền BGM', '#00ff88');
+            } else {
+                adminBgmAudio.pause();
+                socket.emit('admin_toggle_bgm', false);
+                addLog('Đã TẮT nhạc nền BGM', '#ff4444');
+            }
+        }
+
+        function testSound(soundName) {
+            // Phát âm thanh ngay trên trang admin
+            const soundUrls = {
+                coin: '/assets/sounds/coin.wav',
+                fanfare: '/assets/sounds/fanfare.wav',
+                thunder: '/assets/sounds/thunder.wav',
+                join: '/assets/sounds/join.wav',
+                bgm: '/assets/sounds/bgm.wav',
+                success_8386: '/assets/sounds/success_8386.wav',
+                steal_1: '/assets/sounds/steal_1.wav',
+                steal_2: '/assets/sounds/steal_2.wav'
+            };
+            if (soundName === 'success_8386') {
+                new Audio(soundUrls.fanfare).play().catch(() => {});
+                setTimeout(() => {
+                    new Audio(soundUrls.success_8386 + '?t=' + Date.now()).play().catch(() => {});
+                }, 450);
+            } else if (soundName === 'steal_1' || soundName === 'steal_2') {
+                new Audio(soundUrls.thunder).play().catch(() => {});
+                setTimeout(() => {
+                    new Audio(soundUrls[soundName] + '?t=' + Date.now()).play().catch(() => {});
+                }, 450);
+            } else if (soundUrls[soundName]) {
+                const audio = new Audio(soundUrls[soundName]);
+                audio.volume = 1.0;
+                audio.play().catch(e => console.warn('Admin audio play error:', e));
+            }
+            // Gửi lệnh phát đồng thời trên màn hình Game Live
+            socket.emit('admin_play_sound', soundName);
+            addLog(`Đã phát thử nghiệm âm thanh [${soundName.toUpperCase()}]`, '#ffd700');
+        }
+
+        function connectTikTok() {
+            const user = document.getElementById('tiktok-user').value.trim();
+
+            if (user) {
+                connStatus.innerHTML = `⏳ <span style="color: #ffd700;">Đang kết nối tới phòng Live của @${user}...</span>`;
+                addLog(`Đang gửi yêu cầu kết nối phòng Live @${user}...`, '#ffd700');
+                socket.emit('admin_connect_tiktok', user);
+            }
+        }
+
+        function disconnectTikTok() {
+            socket.emit('admin_disconnect_tiktok');
+            connStatus.innerHTML = `<span style="color: #a0aec0;">Đã gửi yêu cầu ngắt kết nối</span>`;
+        }
+
+        socket.on('tiktok_status', status => {
+            const badge = document.getElementById('connection-badge');
+            if (status.connected) {
+                if (badge) {
+                    badge.style.background = '#00ff88';
+                    badge.style.color = '#000';
+                    badge.innerText = 'ĐÃ KẾT NỐI LIVE';
+                }
+                connStatus.innerHTML = `🟢 <b style="color: #00ff88;">ĐÃ KẾT NỐI PHÒNG LIVE CỦA @${status.username}</b> ${status.roomId ? `(Room ID: ${status.roomId})` : ''}`;
+                addLog(`📡 KẾT NỐI THÀNH CÔNG TIKTOK LIVE CỦA @${status.username}! Dữ liệu thật (Quà tặng, Chat, Tim) đang đổ về game.`, '#00ff88');
+            } else {
+                if (badge) {
+                    badge.style.background = 'rgba(255,255,255,0.1)';
+                    badge.style.color = '#a0aec0';
+                    badge.innerText = 'Chưa kết nối';
+                }
+                connStatus.innerHTML = `🔴 <b style="color: #ff4444;">Chưa kết nối:</b> ${status.error || 'Đã ngắt kết nối'}`;
+                addLog(`❌ Trạng thái TikTok Live: ${status.error || 'Đã ngắt kết nối'}`, '#ff4444');
+            }
+        });
+    </script>
+</body>
+</html>
