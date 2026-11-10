@@ -258,10 +258,10 @@ body {
    ========================================= */
 .dps-board {
     position: absolute;
-    top: 124px;
+    top: 146px;
     left: 6px;
     width: 134px;
-    max-height: 330px;
+    max-height: 310px;
     overflow-y: auto;
     background: rgba(10, 15, 25, 0.9);
     backdrop-filter: blur(6px);
@@ -430,7 +430,7 @@ body {
 /* Shadow Army Board */
 .shadow-army-board {
     position: absolute;
-    top: 124px;
+    top: 146px;
     right: 6px;
     width: 108px;
     background: rgba(20, 10, 35, 0.88);
