@@ -773,7 +773,53 @@ io.on('connection', (socket) => {
         }
     });
 
-    // ADMIN EVENTS
+    // ADMIN & CLIENT ATTACK EVENTS
+    socket.on('player_attack', (data) => {
+        const uid = (data && data.uniqueId) || 'hunter_solo';
+        const nick = (data && data.nickname) || 'Thợ Săn Solo';
+        const user = getOrCreatePlayer(uid, nick, data && data.avatar);
+        const count = (data && data.count) || 1;
+        dealDamage(user, 15 * count, 'like');
+    });
+
+    socket.on('player_gift', (gift) => {
+        const uid = (gift && gift.uniqueId) || ('vip_' + Math.floor(Math.random() * 999));
+        const nick = (gift && gift.nickname) || 'Đại Gia Solo';
+        const user = getOrCreatePlayer(uid, nick, gift && gift.avatar);
+        const diamonds = (gift && gift.diamonds) || 1;
+        user.totalDiamonds += diamonds;
+
+        let dmg = diamonds * 500;
+        if (diamonds >= 99) {
+            dmg = Math.max(100000, diamonds * 1500);
+            user.isShadowSoldier = true;
+            if (!shadowArmy.some(s => s.uniqueId === user.uniqueId)) {
+                shadowArmy.unshift({
+                    uniqueId: user.uniqueId,
+                    nickname: user.nickname,
+                    avatar: user.avatar,
+                    rank: 'S'
+                });
+                if (shadowArmy.length > 8) shadowArmy.pop();
+            }
+            io.emit('arise_activated', {
+                player: {
+                    nickname: user.nickname,
+                    avatar: user.avatar,
+                    rank: user.rank
+                },
+                giftName: gift.giftName,
+                diamonds
+            });
+        }
+
+        dealDamage(user, dmg, 'gift', {
+            giftName: gift.giftName,
+            giftIcon: gift.giftIcon,
+            diamonds
+        });
+    });
+
     socket.on('admin_tap_attack', (count = 1) => {
         const testUser = getOrCreatePlayer('test_hunter_1', 'Thợ Săn Solo (Test)', DEFAULT_AVATARS[0]);
         dealDamage(testUser, 15 * count, 'like');

@@ -74,6 +74,52 @@ function playSlashSound(isCrit = false) {
 }
 
 // ==========================================
+// THỢ SĂN TƯƠNG TÁC (TẤN CÔNG & TẶNG QUÀ TẠI MÀN GAME)
+// ==========================================
+let myHunterId = localStorage.getItem('solo_hunter_id');
+let myHunterName = localStorage.getItem('solo_hunter_name');
+let myHunterAvatar = localStorage.getItem('solo_hunter_avatar');
+
+if (!myHunterId) {
+    const randNum = Math.floor(1000 + Math.random() * 9000);
+    myHunterId = 'hunter_' + randNum;
+    myHunterName = 'Thợ Săn #' + randNum;
+    const sampleAvatars = [
+        'https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?w=150',
+        'https://images.unsplash.com/photo-1570295999919-56ceb5ecca61?w=150',
+        'https://images.unsplash.com/photo-1494790108377-be9c29b29330?w=150',
+        'https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=150'
+    ];
+    myHunterAvatar = sampleAvatars[Math.floor(Math.random() * sampleAvatars.length)];
+    localStorage.setItem('solo_hunter_id', myHunterId);
+    localStorage.setItem('solo_hunter_name', myHunterName);
+    localStorage.setItem('solo_hunter_avatar', myHunterAvatar);
+}
+
+function triggerTap(count = 1) {
+    unlockGameAudio();
+    playSlashSound(count > 1);
+    socket.emit('player_attack', {
+        uniqueId: myHunterId,
+        nickname: myHunterName,
+        avatar: myHunterAvatar,
+        count
+    });
+}
+
+function triggerGift(giftName, diamonds, giftIcon) {
+    unlockGameAudio();
+    socket.emit('player_gift', {
+        uniqueId: myHunterId,
+        nickname: myHunterName,
+        avatar: myHunterAvatar,
+        giftName,
+        diamonds,
+        giftIcon
+    });
+}
+
+// ==========================================
 // 2. CANVAS HẠT VẾT CHÉM KIẾM (SLASH PARTICLES)
 // ==========================================
 const canvas = document.getElementById('fx-canvas');
@@ -164,6 +210,20 @@ const bossAttackOverlay = document.getElementById('boss-attack-overlay');
 const attackImpactText = document.getElementById('attack-impact-text');
 const bossStunStars = document.getElementById('boss-stun-stars');
 const gameViewport = document.getElementById('game-viewport');
+
+// Click / Gõ bất kỳ đâu trên màn hình game để thả tim chém quái
+if (gameViewport) {
+    gameViewport.addEventListener('click', (e) => {
+        if (e.target.closest('.footer-skills-container') || e.target.closest('.dps-board') || e.target.closest('.shadow-army-board') || e.target.closest('a') || e.target.closest('button')) {
+            return;
+        }
+        const rect = gameViewport.getBoundingClientRect();
+        const clickX = e.clientX - rect.left;
+        const clickY = e.clientY - rect.top;
+        addSlashParticle(clickX, clickY, '#00ffff');
+        triggerTap(1);
+    });
+}
 
 // Elements cho Đồng Hồ Đếm Giờ Hầm Ngục & Thất Bại
 const dungeonTimerBox = document.getElementById('dungeon-timer-box');
