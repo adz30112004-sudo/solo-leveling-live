@@ -25,6 +25,7 @@ const STAGES = [
         bossName: 'Vua Goblin Hắc Ám',
         bossTitle: 'Chúa Tể Bộ Tộc Quỷ Lùn',
         bossImage: '/assets/boss_goblin.png',
+        bgImage: '/assets/bg_goblin.png',
         maxHp: 50000,
         themeColor: '#00ff88',
         bgGradient: 'radial-gradient(circle at 50% 35%, rgba(0, 255, 136, 0.15) 0%, rgba(10, 15, 20, 0.95) 75%)'
@@ -36,6 +37,7 @@ const STAGES = [
         bossName: 'Bạch Quỷ Vương Baruka',
         bossTitle: 'Hàn Băng Thần Tướng',
         bossImage: '/assets/boss_baruka.png',
+        bgImage: '/assets/bg_snow.png',
         maxHp: 200000,
         themeColor: '#00c6ff',
         bgGradient: 'radial-gradient(circle at 50% 35%, rgba(0, 198, 255, 0.2) 0%, rgba(10, 15, 30, 0.95) 75%)'
@@ -47,6 +49,7 @@ const STAGES = [
         bossName: 'Quỷ Vương Baran',
         bossTitle: 'Lôi Thần Thống Lĩnh',
         bossImage: '/assets/boss_baran.png',
+        bgImage: '/assets/bg_demon.png',
         maxHp: 600000,
         themeColor: '#ff0055',
         bgGradient: 'radial-gradient(circle at 50% 35%, rgba(255, 0, 85, 0.25) 0%, rgba(25, 10, 15, 0.95) 75%)'
@@ -58,6 +61,7 @@ const STAGES = [
         bossName: 'Kiến Vương Beru',
         bossTitle: 'Vua Diệt Chủng Thợ Săn',
         bossImage: '/assets/boss_beru.png',
+        bgImage: '/assets/bg_jeju.png',
         maxHp: 1500000,
         themeColor: '#a855f7',
         bgGradient: 'radial-gradient(circle at 50% 35%, rgba(168, 85, 247, 0.3) 0%, rgba(15, 5, 25, 0.95) 75%)'
@@ -69,6 +73,7 @@ const STAGES = [
         bossName: 'Tượng Thần Cười Cổ Đại',
         bossTitle: 'Kẻ Thống Trị Đền Thờ Cấm Kỵ',
         bossImage: '/assets/boss_statue.png',
+        bgImage: '/assets/bg_temple.png',
         maxHp: 5000000,
         themeColor: '#ef4444',
         bgGradient: 'radial-gradient(circle at 50% 35%, rgba(239, 68, 68, 0.35) 0%, rgba(20, 5, 5, 0.95) 75%)'

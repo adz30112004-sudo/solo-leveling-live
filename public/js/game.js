@@ -157,6 +157,10 @@ function updateStageInfo(stage, currentHp, maxHp) {
     if (stage.bossImage) {
         bossSpriteEl.src = stage.bossImage;
     }
+    const vp = document.getElementById('game-viewport');
+    if (vp && stage.bgImage) {
+        vp.style.backgroundImage = `url('${stage.bgImage}')`;
+    }
     updateHpBar(currentHp, maxHp);
 }
 
