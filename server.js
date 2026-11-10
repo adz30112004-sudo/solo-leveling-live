@@ -372,10 +372,7 @@ function retryCurrentStage() {
     resetBossRageState();
     startDungeonTimer();
 
-    // Reset lại sát thương vòng mới
-    for (const p of players.values()) {
-        p.totalDamage = 0;
-    }
+    // Giữ nguyên toàn bộ công sức của thợ săn: cấp độ, rank, tổng sát thương tích luỹ
     updateLeaderboards();
 
     io.emit('stage_retried', {
@@ -560,10 +557,7 @@ function goToNextStage() {
     resetBossRageState();
     startDungeonTimer();
 
-    // Reset sát thương vòng mới để mọi người cùng đua lại Top DPS
-    for (const p of players.values()) {
-        p.totalDamage = 0;
-    }
+    // Giữ nguyên toàn bộ chỉ số, cấp bậc và sát thương tích luỹ của thợ săn qua các màn
     updateLeaderboards();
 
     io.emit('new_stage_started', {
@@ -588,9 +582,7 @@ function setCustomStage(stageIndex) {
         lastHitter = null;
         resetBossRageState();
         startDungeonTimer();
-        for (const p of players.values()) {
-            p.totalDamage = 0;
-        }
+        // Giữ nguyên toàn bộ chỉ số, cấp bậc và sát thương tích luỹ của thợ săn
         updateLeaderboards();
         io.emit('new_stage_started', {
             stage: s,
@@ -954,6 +946,13 @@ io.on('connection', (socket) => {
             quote: chosen.quote
         });
         console.log(`✨ Mock Level Up emitted for ${chosen.name}: Lv.${chosen.oldLvl} -> Lv.${chosen.newLvl}`);
+    });
+
+    socket.on('admin_reset_all_hunters', () => {
+        players.clear();
+        updateLeaderboards();
+        io.emit('leaderboard_updated', { topDps, topDonators, currentStage });
+        console.log('🔄 Đã xoá toàn bộ dữ liệu thợ săn theo yêu cầu Admin');
     });
 
     socket.on('admin_connect_tiktok', (username) => {
