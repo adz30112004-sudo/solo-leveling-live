@@ -204,10 +204,11 @@
                     <div id="mon-hp-bar" class="hp-bar-fill" style="width: 100%;"></div>
                 </div>
 
-                <!-- THANH NỘ KHÍ & KHIÊN TỔ ĐỘI TRÊN ADMIN -->
+                <!-- THANH NỘ KHÍ & KHIÊN TỔ ĐỘI & ĐỒNG HỒ TRÊN ADMIN -->
                 <div style="display: flex; justify-content: space-between; font-size: 11px; margin-top: 6px;">
                     <span style="color: #fb923c; font-weight: 800;">🔥 Nộ Khí: <b id="mon-rage-text">0%</b></span>
-                    <span style="color: #38bdf8; font-weight: 800;">🛡️ Khiên Tổ Đội: <b id="mon-shield-text">100%</b></span>
+                    <span style="color: #00c6ff; font-weight: 800;">⏱️ Đóng Cổng: <b id="mon-timer-text">02:00</b></span>
+                    <span style="color: #38bdf8; font-weight: 800;">🛡️ Khiên: <b id="mon-shield-text">100%</b></span>
                 </div>
                 <div style="display: flex; gap: 8px;">
                     <div style="flex: 1; height: 8px; background: #2a1505; border-radius: 4px; overflow: hidden; border: 1px solid #f97316;">
@@ -220,10 +221,10 @@
             </div>
         </div>
 
-        <!-- 1.5. ĐIỀU KHIỂN QUÁI ĐÁNH TRẢ & CUỒNG NỘ (BOSS COUNTER-ATTACK) -->
+        <!-- 1.5. ĐIỀU KHIỂN QUÁI ĐÁNH TRẢ & THỜI GIAN HẦM NGỤC -->
         <div class="card" style="border: 1.5px solid #ef4444; background: #160a0f;">
             <div class="card-title" style="color: #f87171;">
-                <span>🔥 Hệ Thống Quái Đánh Trả & Tuyệt Kỹ (Boss Counter-Attack)</span>
+                <span>🔥 Hệ Thống Quái Đánh Trả & Đồng Hồ Hầm Ngục (Dungeon Timer & Counter-Attack)</span>
                 <span id="auto-rage-badge" style="font-size: 11px; background: #00ff88; color: #000; padding: 2px 8px; border-radius: 10px; font-weight: 800;">TỰ ĐỘNG: BẬT</span>
             </div>
             <div class="btn-grid">
@@ -241,6 +242,15 @@
                 </button>
                 <button class="btn-gate" id="btn-toggle-auto" onclick="toggleAutoRage()">
                     🔄 Bật/Tắt Tự Động Nộ
+                </button>
+                <button class="btn-gate" onclick="setTimer(10)" style="background: #7c2d12; color: #fed7aa; border-color: #f97316;">
+                    ⏱️ Chỉnh Giờ Còn 10s (Test Hết Giờ)
+                </button>
+                <button class="btn-gate" onclick="setTimer(120)" style="background: #064e3b; color: #a7f3d0; border-color: #10b981;">
+                    ⏱️ Hồi Giờ Về 2 Phút
+                </button>
+                <button class="btn-danger" onclick="triggerFail()" style="background: #450a0a; border: 1px solid #ef4444;">
+                    💀 Đóng Cổng Thất Bại Ngay
                 </button>
             </div>
         </div>
@@ -355,7 +365,49 @@
             updateMonitor(data.stage, data.bossCurrentHp, data.bossMaxHp);
             updateRageMonitor(data.bossRage, data.hunterShield);
             updateAutoRageBadge(data.autoRageEnabled);
+            if (data.dungeonTimeRemaining !== undefined) {
+                document.getElementById('mon-timer-text').innerText = formatSec(data.dungeonTimeRemaining);
+            }
         });
+
+        socket.on('dungeon_timer_tick', (data) => {
+            const timerEl = document.getElementById('mon-timer-text');
+            if (timerEl) {
+                timerEl.innerText = formatSec(data.remaining);
+                timerEl.style.color = data.isWarning ? '#ef4444' : '#00c6ff';
+            }
+        });
+
+        socket.on('dungeon_failed', (data) => {
+            addLog(`💀 HẾT THỜI GIAN: CỔNG HẦM NGỤC ĐÃ ĐÓNG! THĂNG CẤP THẤT BẠI!`, '#ef4444');
+        });
+
+        socket.on('fail_countdown', (data) => {
+            addLog(`⏳ Tự động mở lại Cổng sau thất bại trong: ${data.countdown}s...`, '#f59e0b');
+        });
+
+        socket.on('stage_retried', (data) => {
+            updateMonitor(data.stage, data.bossCurrentHp, data.bossMaxHp);
+            updateRageMonitor(0, 100);
+            addLog(`🔄 CỔNG ĐÃ ĐƯỢC THIẾT LẬP LẠI: Thợ săn bắt đầu vòng mới!`, '#00ff88');
+        });
+
+        function formatSec(sec) {
+            const s = Math.max(0, Math.floor(sec || 0));
+            const m = Math.floor(s / 60);
+            const rem = s % 60;
+            return `${m < 10 ? '0' : ''}${m}:${rem < 10 ? '0' : ''}${rem}`;
+        }
+
+        function setTimer(sec) {
+            socket.emit('admin_set_dungeon_timer', sec);
+            addLog(`Đã chỉnh đồng hồ hầm ngục về: ${sec}s`, '#00c6ff');
+        }
+
+        function triggerFail() {
+            socket.emit('admin_trigger_dungeon_fail');
+            addLog('Đã kích hoạt đóng Cổng hầm ngục (thất bại)', '#ef4444');
+        }
 
         socket.on('boss_damaged', (data) => {
             updateMonitorHp(data.bossCurrentHp, data.bossMaxHp);

@@ -56,10 +56,17 @@
                 <div id="top-hunter-diamonds" class="hunter-diamonds">0 💎</div>
             </div>
 
-            <!-- Tên Cổng Hầm Ngục & Cấp Độ -->
-            <div class="gate-badge-box">
-                <span id="gate-rank-badge" class="gate-rank-badge">HẠNG S</span>
-                <span id="gate-name" class="gate-name">CỔNG HẠNG S: ĐẢO KIẾN JEJU</span>
+            <!-- Tên Cổng Hầm Ngục & Cấp Độ & Đồng Hồ Đếm Giờ Đóng Cổng -->
+            <div class="gate-header-row">
+                <div class="gate-badge-box">
+                    <span id="gate-rank-badge" class="gate-rank-badge">HẠNG S</span>
+                    <span id="gate-name" class="gate-name">CỔNG HẠNG S: ĐẢO KIẾN JEJU</span>
+                </div>
+                <div class="dungeon-timer-box" id="dungeon-timer-box">
+                    <span class="timer-icon">⏳</span>
+                    <span class="timer-label">ĐÓNG CỔNG:</span>
+                    <span id="dungeon-timer-clock" class="timer-clock">02:00</span>
+                </div>
             </div>
 
             <!-- THANH MÁU ĐẠI BOSS KHỔNG LỒ -->
@@ -154,24 +161,33 @@
                 </div>
             </div>
 
-            <!-- HIỆU ỨNG QUÁI ĐÁNH TRẢ (COUNTER-ATTACK OVERLAY) -->
-            <div id="boss-attack-overlay" class="boss-attack-overlay hidden">
-                <div class="claw-scratch claw-1"></div>
-                <div class="claw-scratch claw-2"></div>
-                <div class="claw-scratch claw-3"></div>
-                <div class="attack-impact-text" id="attack-impact-text">⚡ QUÁI ĐÁNH TRẢ! ⚡</div>
-            </div>
-
             <!-- CONTAINER SỐ DAMAGE BAY LÊN (FLOATING DAMAGE NUMBERS) -->
             <div id="damage-container" class="damage-container"></div>
 
-            <!-- BÃNG THÔNG BÁO BOSS BỊ HẠ GỤC -->
+            <!-- BẢNG THÔNG BÁO BOSS BỊ HẠ GỤC -->
             <div id="victory-banner" class="victory-banner hidden">
                 <div class="vic-title">🎉 HẦM NGỤC ĐÃ ĐƯỢC CHINH PHỤC! 🎉</div>
                 <div class="vic-killer" id="vic-killer">Đòn Kết Liễu: @Thợ Săn Hạng S</div>
                 <div class="vic-chest">🎁 RƯƠNG BÁU HOÀNG KIM ĐÃ MỞ! 🎁</div>
                 <div class="vic-next-gate" id="vic-next-gate">Cổng Tiếp Theo Mở Trong: <b>6s</b></div>
             </div>
+
+            <!-- BẢNG THÔNG BÁO HẾT GIỜ - THĂNG CẤP THẤT BẠI -->
+            <div id="defeat-banner" class="defeat-banner hidden">
+                <div class="defeat-skull">💀 CỔNG HẦM NGỤC ĐÃ ĐÓNG! 💀</div>
+                <div class="defeat-title">THĂNG CẤP THẤT BẠI</div>
+                <div class="defeat-desc">Hết thời gian! Quân đoàn thợ săn không kịp hạ gục Đại Boss!</div>
+                <div class="defeat-retry" id="defeat-retry-text">Tự Động Mở Lại Cổng Trong: <b>5s</b></div>
+            </div>
+        </div>
+
+        <!-- HIỆU ỨNG QUÁI ĐÁNH TRẢ TOÀN MÀN HÌNH (FULL VIEWPORT OVERLAY) -->
+        <div id="boss-attack-overlay" class="boss-attack-overlay hidden">
+            <div class="claw-scratch claw-1"></div>
+            <div class="claw-scratch claw-2"></div>
+            <div class="claw-scratch claw-3"></div>
+            <div class="attack-impact-text" id="attack-impact-text">⚡ QUÁI ĐÁNH TRẢ! ⚡</div>
+            <div class="attack-sub-text">💥 -40% KHIÊN TỔ ĐỘI! 💥</div>
         </div>
 
         <!-- 5. HÀNG NGŨ THỢ SĂN XUNG QUANH (KHÁN GIẢ ĐANG CHIẾN ĐẤU) -->

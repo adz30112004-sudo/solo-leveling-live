@@ -27,6 +27,7 @@ const STAGES = [
         bossImage: '/assets/boss_goblin.png',
         bgImage: '/assets/bg_goblin.png',
         maxHp: 50000,
+        timeLimit: 120, // 2 phút
         skillName: 'Mưa Tiễn Quỷ Độc',
         skillDesc: 'Bắn vạn mũi tên tẩm kịch độc gây tê liệt toàn đội thợ săn!',
         themeColor: '#00ff88',
@@ -41,6 +42,7 @@ const STAGES = [
         bossImage: '/assets/boss_baruka.png',
         bgImage: '/assets/bg_snow.png',
         maxHp: 200000,
+        timeLimit: 180, // 3 phút
         skillName: 'Bão Băng Tuyệt Diệt',
         skillDesc: 'Triệu hồi bão tuyết âm độ đóng băng và nứt toác mặt đất!',
         themeColor: '#00c6ff',
@@ -55,6 +57,7 @@ const STAGES = [
         bossImage: '/assets/boss_baran.png',
         bgImage: '/assets/bg_demon.png',
         maxHp: 600000,
+        timeLimit: 240, // 4 phút
         skillName: 'Thiên Lôi Địa Hỏa',
         skillDesc: 'Gọi sấm sét đỏ rực và dung nham hỏa ngục giáng nát chiến trường!',
         themeColor: '#ff0055',
@@ -69,6 +72,7 @@ const STAGES = [
         bossImage: '/assets/boss_beru.png',
         bgImage: '/assets/bg_jeju.png',
         maxHp: 1500000,
+        timeLimit: 300, // 5 phút
         skillName: 'Trảm Hồn Liêm Tử Thần',
         skillDesc: 'Vung song kiếm liêm bóng đêm chém toác không gian với tốc độ âm thanh!',
         themeColor: '#a855f7',
@@ -83,6 +87,7 @@ const STAGES = [
         bossImage: '/assets/boss_statue.png',
         bgImage: '/assets/bg_temple.png',
         maxHp: 5000000,
+        timeLimit: 360, // 6 phút
         skillName: 'Ma Nhãn Tia Hủy Diệt',
         skillDesc: 'Phóng chùm laser chết chóc từ hai mắt thiêu rụi toàn bộ thợ săn!',
         themeColor: '#ef4444',
@@ -98,6 +103,12 @@ let bossCurrentHp = STAGES[0].maxHp;
 let isBossDefeated = false;
 let lastHitter = null;
 let defeatCountdown = null;
+
+// ĐỒNG HỒ ĐẾM NGƯỢC HẦM NGỤC & THẤT BẠI KHI HẾT GIỜ (DUNGEON TIMER)
+let dungeonTimer = null;
+let dungeonTimeRemaining = STAGES[0].timeLimit;
+let isDungeonFailed = false;
+let failCountdown = null;
 
 // HỆ THỐNG NỘ KHÍ & ĐẠI BOSS ĐÁNH LẠI (BOSS COUNTER-ATTACK)
 let bossRage = 0;                // 0 -> 100%
@@ -293,9 +304,93 @@ function resetBossRageState() {
     hunterShield = 100;
 }
 
+// ==========================================
+// ĐỒNG HỒ ĐẾM NGƯỢC HẦM NGỤC & XỬ LÝ HẾT GIỜ (DUNGEON RAID TIMER)
+// ==========================================
+function startDungeonTimer() {
+    if (dungeonTimer) clearInterval(dungeonTimer);
+    if (failCountdown) clearInterval(failCountdown);
+    failCountdown = null;
+
+    const currentStage = STAGES[currentStageIndex];
+    dungeonTimeRemaining = currentStage.timeLimit || 120;
+    isDungeonFailed = false;
+
+    io.emit('dungeon_timer_tick', {
+        remaining: dungeonTimeRemaining,
+        total: currentStage.timeLimit,
+        isWarning: false
+    });
+
+    dungeonTimer = setInterval(() => {
+        if (!isBossDefeated && !isDungeonFailed) {
+            dungeonTimeRemaining--;
+            io.emit('dungeon_timer_tick', {
+                remaining: dungeonTimeRemaining,
+                total: currentStage.timeLimit,
+                isWarning: dungeonTimeRemaining <= 30
+            });
+
+            if (dungeonTimeRemaining <= 0) {
+                clearInterval(dungeonTimer);
+                dungeonTimer = null;
+                onDungeonFailed();
+            }
+        }
+    }, 1000);
+}
+
+function onDungeonFailed() {
+    if (isDungeonFailed || isBossDefeated) return;
+    isDungeonFailed = true;
+    resetBossRageState();
+
+    const currentStage = STAGES[currentStageIndex];
+    io.emit('dungeon_failed', {
+        stage: currentStage
+    });
+
+    let countdown = 6;
+    if (failCountdown) clearInterval(failCountdown);
+    failCountdown = setInterval(() => {
+        countdown--;
+        io.emit('fail_countdown', { countdown });
+        if (countdown <= 0) {
+            clearInterval(failCountdown);
+            failCountdown = null;
+            retryCurrentStage();
+        }
+    }, 1000);
+}
+
+function retryCurrentStage() {
+    isDungeonFailed = false;
+    const currentStage = STAGES[currentStageIndex];
+    bossCurrentHp = currentStage.maxHp;
+    isBossDefeated = false;
+    lastHitter = null;
+    resetBossRageState();
+    startDungeonTimer();
+
+    // Reset lại sát thương vòng mới
+    for (const p of players.values()) {
+        p.totalDamage = 0;
+    }
+    updateLeaderboards();
+
+    io.emit('stage_retried', {
+        stage: currentStage,
+        bossCurrentHp,
+        bossMaxHp: currentStage.maxHp,
+        timeLimit: currentStage.timeLimit,
+        topDps,
+        topDonators
+    });
+}
+
 // Tích nộ tự nhiên theo thời gian
 setInterval(() => {
-    if (autoRageEnabled && !isBossDefeated && !isBossCharging && !isBossStunned) {
+    if (autoRageEnabled && !isBossDefeated && !isBossCharging && !isBossStunned && !isDungeonFailed) {
         bossRage = Math.min(100, bossRage + 2.5);
         io.emit('boss_rage_updated', {
             bossRage: Math.round(bossRage),
@@ -308,7 +403,7 @@ setInterval(() => {
 }, 1000);
 
 function dealDamage(player, rawDamage, actionType, giftData = null) {
-    if (isBossDefeated) return null;
+    if (isBossDefeated || isDungeonFailed) return null;
 
     const currentStage = STAGES[currentStageIndex];
     let damage = Math.max(1, Math.round(rawDamage));
@@ -401,6 +496,10 @@ function onBossDefeated(killer) {
     isBossDefeated = true;
     lastHitter = killer;
     resetBossRageState();
+    if (dungeonTimer) {
+        clearInterval(dungeonTimer);
+        dungeonTimer = null;
+    }
 
     const currentStage = STAGES[currentStageIndex];
 
@@ -438,6 +537,7 @@ function goToNextStage() {
     isBossDefeated = false;
     lastHitter = null;
     resetBossRageState();
+    startDungeonTimer();
 
     // Reset sát thương vòng mới để mọi người cùng đua lại Top DPS
     for (const p of players.values()) {
@@ -466,6 +566,7 @@ function setCustomStage(stageIndex) {
         isBossDefeated = false;
         lastHitter = null;
         resetBossRageState();
+        startDungeonTimer();
         for (const p of players.values()) {
             p.totalDamage = 0;
         }
@@ -637,6 +738,9 @@ io.on('connection', (socket) => {
         stage: currentStage,
         bossCurrentHp,
         bossMaxHp: currentStage.maxHp,
+        dungeonTimeRemaining,
+        dungeonTimeLimit: currentStage.timeLimit,
+        isDungeonFailed,
         bossRage: Math.round(bossRage),
         isBossCharging,
         isBossStunned,
@@ -649,7 +753,7 @@ io.on('connection', (socket) => {
         topDps,
         topDonators,
         shadowArmy,
-        stagesList: STAGES.map(s => ({ id: s.id, name: s.name, rank: s.rank, maxHp: s.maxHp, skillName: s.skillName })),
+        stagesList: STAGES.map(s => ({ id: s.id, name: s.name, rank: s.rank, maxHp: s.maxHp, skillName: s.skillName, timeLimit: s.timeLimit })),
         tiktokStatus: {
             connected: isTikTokConnected,
             username: currentTikTokUsername
@@ -740,8 +844,10 @@ io.on('connection', (socket) => {
         const s = STAGES[currentStageIndex];
         bossCurrentHp = s.maxHp;
         isBossDefeated = false;
+        isDungeonFailed = false;
         lastHitter = null;
         resetBossRageState();
+        startDungeonTimer();
         io.emit('boss_reset', {
             stage: s,
             bossCurrentHp,
@@ -749,6 +855,19 @@ io.on('connection', (socket) => {
             bossRage: 0,
             hunterShield: 100
         });
+    });
+
+    socket.on('admin_set_dungeon_timer', (sec = 10) => {
+        dungeonTimeRemaining = Math.max(1, sec);
+        io.emit('dungeon_timer_tick', {
+            remaining: dungeonTimeRemaining,
+            total: STAGES[currentStageIndex].timeLimit,
+            isWarning: dungeonTimeRemaining <= 30
+        });
+    });
+
+    socket.on('admin_trigger_dungeon_fail', () => {
+        onDungeonFailed();
     });
 
     socket.on('admin_play_sound', (soundName) => {
@@ -772,6 +891,7 @@ io.on('connection', (socket) => {
 
 const PORT = process.env.PORT || 3000;
 server.listen(PORT, () => {
+    startDungeonTimer();
     console.log(`=======================================================`);
     console.log(`⚔️ GAME SOLO LEVELING RAID BOSS ĐANG CHẠY TẠI: http://localhost:${PORT}`);
     console.log(`🎮 BẢNG QUẢN TRỊ ADMIN TEST: http://localhost:${PORT}/admin.html`);

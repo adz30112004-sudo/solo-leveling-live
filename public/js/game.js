@@ -149,6 +149,19 @@ const attackImpactText = document.getElementById('attack-impact-text');
 const bossStunStars = document.getElementById('boss-stun-stars');
 const gameViewport = document.getElementById('game-viewport');
 
+// Elements cho Đồng Hồ Đếm Giờ Hầm Ngục & Thất Bại
+const dungeonTimerBox = document.getElementById('dungeon-timer-box');
+const dungeonTimerClock = document.getElementById('dungeon-timer-clock');
+const defeatBanner = document.getElementById('defeat-banner');
+const defeatRetryText = document.getElementById('defeat-retry-text');
+
+function formatSeconds(sec) {
+    const s = Math.max(0, Math.floor(sec || 0));
+    const m = Math.floor(s / 60);
+    const rem = s % 60;
+    return `${m < 10 ? '0' : ''}${m}:${rem < 10 ? '0' : ''}${rem}`;
+}
+
 function formatNumber(num) {
     if (num >= 1000000) return (num / 1000000).toFixed(1) + 'M';
     if (num >= 1000) return (num / 1000).toFixed(1) + 'K';
@@ -195,10 +208,12 @@ function updateStageInfo(stage, currentHp, maxHp) {
     updateRageAndShield(0, 100);
     if (bossContainer) {
         bossContainer.classList.remove('boss-charging', 'boss-counter-attack', 'boss-stunned');
+        bossContainer.style.filter = '';
     }
     if (bossChargeAlert) bossChargeAlert.classList.add('hidden');
     if (bossStunStars) bossStunStars.classList.add('hidden');
     if (bossAttackOverlay) bossAttackOverlay.classList.add('hidden');
+    if (defeatBanner) defeatBanner.classList.add('hidden');
 }
 
 function spawnDamageNumber(damage, type = 'normal', nickname = '') {
@@ -362,6 +377,12 @@ socket.on('init_game_state', (data) => {
     renderLeaderboards(data.topDps, data.topDonators);
     renderShadowArmy(data.shadowArmy);
     updateRageAndShield(data.bossRage, data.hunterShield);
+    if (dungeonTimerClock && data.dungeonTimeRemaining !== undefined) {
+        dungeonTimerClock.innerText = formatSeconds(data.dungeonTimeRemaining);
+    }
+    if (data.isDungeonFailed && defeatBanner) {
+        defeatBanner.classList.remove('hidden');
+    }
     if (data.isBossCharging && bossChargeAlert) {
         bossChargeAlert.classList.remove('hidden');
         if (bossContainer) bossContainer.classList.add('boss-charging');
@@ -373,6 +394,43 @@ socket.on('init_game_state', (data) => {
     if (data.isBossDefeated) {
         victoryBanner.classList.remove('hidden');
     }
+});
+
+// Đếm ngược đóng cổng hầm ngục
+socket.on('dungeon_timer_tick', (data) => {
+    if (dungeonTimerClock) dungeonTimerClock.innerText = formatSeconds(data.remaining);
+    if (dungeonTimerBox) {
+        if (data.isWarning) {
+            dungeonTimerBox.classList.add('timer-warning');
+        } else {
+            dungeonTimerBox.classList.remove('timer-warning');
+        }
+    }
+});
+
+// Thăng cấp thất bại khi hết giờ
+socket.on('dungeon_failed', (data) => {
+    playSound('thunder');
+    if (defeatBanner) defeatBanner.classList.remove('hidden');
+    if (bossContainer) {
+        bossContainer.classList.remove('boss-charging', 'boss-counter-attack');
+        bossContainer.style.filter = 'grayscale(1) brightness(0.5)';
+    }
+    if (bossChargeAlert) bossChargeAlert.classList.add('hidden');
+});
+
+socket.on('fail_countdown', (data) => {
+    if (defeatRetryText) {
+        defeatRetryText.innerHTML = `Tự Động Mở Lại Cổng Trong: <b>${data.countdown}s</b>`;
+    }
+});
+
+socket.on('stage_retried', (data) => {
+    if (defeatBanner) defeatBanner.classList.add('hidden');
+    if (bossContainer) bossContainer.style.filter = '';
+    updateStageInfo(data.stage, data.bossCurrentHp, data.bossMaxHp);
+    renderLeaderboards(data.topDps, data.topDonators);
+    playSound('fanfare');
 });
 
 // Cập nhật Nộ khí & Khiên bảo vệ
@@ -414,37 +472,56 @@ socket.on('charge_hits_updated', (data) => {
 // QUÁI ĐÁNH TRẢ (COUNTER-ATTACK)
 socket.on('boss_attack_triggered', (data) => {
     if (bossChargeAlert) bossChargeAlert.classList.add('hidden');
+
+    // Boss Lunge Animation
     if (bossContainer) {
         bossContainer.classList.remove('boss-charging');
+        bossContainer.classList.remove('boss-counter-attack');
+        void bossContainer.offsetWidth; // force reflow
         bossContainer.classList.add('boss-counter-attack');
     }
 
-    // Rung lắc màn hình & hiệu ứng vết cào
+    // Rung lắc toàn bộ viewport & chớp đỏ
     if (gameViewport) {
         gameViewport.classList.remove('screen-shake-heavy');
         void gameViewport.offsetWidth;
         gameViewport.classList.add('screen-shake-heavy');
 
-        // Màn hình chớp đỏ
+        // Màn hình chớp đỏ toàn màn hình
         const flash = document.createElement('div');
         flash.className = 'screen-flash-red';
         gameViewport.appendChild(flash);
-        setTimeout(() => flash.remove(), 600);
+        setTimeout(() => flash.remove(), 700);
     }
 
+    // Replay claw animation dynamic HTML
     if (bossAttackOverlay) {
+        bossAttackOverlay.innerHTML = `
+            <div class="claw-scratch claw-1"></div>
+            <div class="claw-scratch claw-2"></div>
+            <div class="claw-scratch claw-3"></div>
+            <div class="attack-impact-text">⚡ ${data.skillName ? data.skillName.toUpperCase() : 'QUÁI ĐÁNH TRẢ'}! ⚡</div>
+            <div class="attack-sub-text">💥 -${data.damageToShield || 40}% KHIÊN TỔ ĐỘI! 💥</div>
+        `;
         bossAttackOverlay.classList.remove('hidden');
-        if (attackImpactText) attackImpactText.innerText = `⚡ ${data.skillName.toUpperCase()}! ⚡`;
+    }
+
+    // Bắn vệt chém đỏ dữ dội trên canvas
+    for (let i = 0; i < 8; i++) {
+        const cx = Math.random() * canvas.width;
+        const cy = Math.random() * canvas.height;
+        addSlashParticle(cx, cy, '#ff0033');
     }
 
     playSound('thunder');
+    playSlashSound(true);
     updateRageAndShield(0, data.hunterShield);
 
     setTimeout(() => {
         if (bossContainer) bossContainer.classList.remove('boss-counter-attack');
         if (bossAttackOverlay) bossAttackOverlay.classList.add('hidden');
         if (gameViewport) gameViewport.classList.remove('screen-shake-heavy');
-    }, 1200);
+    }, 1400);
 });
 
 // Boss bị phá chiêu / Choáng (Stunned)
