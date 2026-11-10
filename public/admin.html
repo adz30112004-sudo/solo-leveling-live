@@ -304,10 +304,13 @@
                 </button>
             </div>
 
-            <div style="font-size: 12px; font-weight: 700; color: #38bdf8; margin-top: 8px;">4. Bảng Xếp Hạng Top 10 Thợ Săn:</div>
+            <div style="font-size: 12px; font-weight: 700; color: #38bdf8; margin-top: 8px;">4. Bảng Xếp Hạng & Vinh Danh Lên Cấp:</div>
             <div class="btn-grid">
                 <button class="btn-gate" onclick="mock10Hunters()" style="background: #0c2738; border: 1.5px solid #0284c7; color: #7dd3fc; font-weight: 800;">
-                    👥 Giả Lập 10 Thợ Săn Hàng Đầu (Đủ Cấp Độ & Thứ Hạng)
+                    👥 Giả Lập 10 Thợ Săn Hàng Đầu
+                </button>
+                <button class="btn-vip" onclick="mockLevelUp()" style="background: linear-gradient(135deg, #0284c7, #38bdf8); border: 1.5px solid #00d2ff; color: #fff; font-weight: 900;">
+                    ⚡ Giả Lập Thợ Săn Lên Cấp (Test Vinh Danh)
                 </button>
             </div>
         </div>
@@ -599,6 +602,11 @@
         function mock10Hunters() {
             socket.emit('admin_mock_10_hunters');
             addLog('Đã nạp danh sách 10 thợ săn hàng đầu vào bảng xếp hạng', '#38bdf8');
+        }
+
+        function mockLevelUp() {
+            socket.emit('admin_mock_level_up');
+            addLog('Đã kích hoạt sự kiện Thợ Săn Lên Cấp (Vinh Danh)', '#38bdf8');
         }
 
         function switchGate(idx) {

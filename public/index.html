@@ -198,8 +198,43 @@
             <!-- Render avatar khán giả vung kiếm chém -->
         </div>
 
-        <!-- 6. TOAST THÔNG BÁO TẶNG QUÀ / THĂNG CẤP -->
+        <!-- 6. TOAST THÔNG BÁO TẶNG QUÀ -->
         <div id="toast-container" class="toast-container"></div>
+
+        <!-- 6.5. BẢNG VINH DANH THỢ SĂN LÊN CẤP (SOLO LEVELING SYSTEM WINDOW) -->
+        <div id="level-up-modal" class="level-up-modal hidden">
+            <div class="sys-bracket top-left"></div>
+            <div class="sys-bracket top-right"></div>
+            <div class="sys-bracket bottom-left"></div>
+            <div class="sys-bracket bottom-right"></div>
+            
+            <div class="level-up-top-tag">
+                <span class="sys-alert-pulse">⚡</span>
+                <span class="sys-tag-text">[ THÔNG BÁO HỆ THỐNG / SYSTEM ]</span>
+                <span class="sys-alert-pulse">⚡</span>
+            </div>
+            
+            <div class="level-up-headline">THỢ SĂN THĂNG CẤP!</div>
+            
+            <div class="level-up-content">
+                <div class="lvl-avatar-box">
+                    <div class="lvl-avatar-glow"></div>
+                    <img id="lvl-avatar-img" class="lvl-avatar-img" src="https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?w=150" alt="Hunter">
+                    <span id="lvl-badge-rank" class="lvl-badge-rank">HẠNG S</span>
+                </div>
+                
+                <div class="lvl-text-group">
+                    <div id="lvl-hunter-name" class="lvl-hunter-name">@Sung Jin-woo</div>
+                    <div class="lvl-transition-row">
+                        <span id="lvl-from-num" class="lvl-from-num">Lv.14</span>
+                        <span class="lvl-arrow-anim">➔</span>
+                        <span id="lvl-to-num" class="lvl-to-num">Lv.15</span>
+                        <span class="lvl-up-sparkle">UP! ⬆️</span>
+                    </div>
+                    <div id="lvl-quote" class="lvl-quote">✨ Ma lực bùng nổ, sức mạnh thợ săn tăng vọt!</div>
+                </div>
+            </div>
+        </div>
 
         <!-- 7. THANH HƯỚNG DẪN KÍCH HOẠT KỸ NĂNG ĐÁY MÀN HÌNH -->
         <div class="footer-skills-bar">

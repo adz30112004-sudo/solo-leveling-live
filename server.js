@@ -452,10 +452,31 @@ function dealDamage(player, rawDamage, actionType, giftData = null) {
     const expGained = giftData ? giftData.diamonds * 1000 : Math.round(damage * 0.5);
     player.exp += expGained;
     const oldRank = player.rank;
+    const oldLevel = player.level || 1;
     player.rank = calculateRank(player.exp, player.totalDiamonds);
     player.level = calculateLevel(player.exp);
 
     const isRankUp = player.rank !== oldRank;
+    const isLevelUp = player.level > oldLevel;
+
+    // Phát sự kiện vinh danh thợ săn lên cấp hoặc thăng hạng
+    if (isLevelUp || isRankUp) {
+        io.emit('hunter_level_up', {
+            player: {
+                uniqueId: player.uniqueId,
+                nickname: player.nickname,
+                avatar: player.avatar,
+                rank: player.rank,
+                level: player.level
+            },
+            oldLevel,
+            newLevel: player.level,
+            oldRank,
+            newRank: player.rank,
+            isLevelUp,
+            isRankUp
+        });
+    }
 
     updateLeaderboards();
 
@@ -900,6 +921,39 @@ io.on('connection', (socket) => {
         updateLeaderboards();
         io.emit('leaderboard_updated', { topDps, topDonators, currentStage });
         console.log('✅ Đã nạp danh sách 10 thợ săn hàng đầu');
+    });
+
+    socket.on('admin_mock_level_up', () => {
+        const mockLevels = [
+            { name: 'Sung Jin-woo', rank: 'QUỐC GIA', oldLvl: 99, newLvl: 100, avatar: 'https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?w=150', quote: 'Ma lực Hắc Ám Hoàng Đế bùng nổ đến đỉnh cao!' },
+            { name: 'Cha Hae-in', rank: 'S', oldLvl: 61, newLvl: 62, avatar: 'https://images.unsplash.com/photo-1494790108377-be9c29b29330?w=150', quote: 'Kiếm pháp Vũ Điệu Ánh Sáng đạt cảnh giới mới!' },
+            { name: 'Thợ Săn Mới', rank: 'A', oldLvl: 34, newLvl: 35, avatar: 'https://images.unsplash.com/photo-1570295999919-56ceb5ecca61?w=150', quote: 'Sức mạnh ma lực được khai mở vượt bậc!' }
+        ];
+        const chosen = mockLevels[Math.floor(Math.random() * mockLevels.length)];
+        const p = getOrCreatePlayer('mock_' + chosen.name, chosen.name, chosen.avatar);
+        p.level = chosen.newLvl;
+        p.rank = chosen.rank;
+        p.totalDamage += 25000;
+        updateLeaderboards();
+        io.emit('leaderboard_updated', { topDps, topDonators, currentStage });
+
+        io.emit('hunter_level_up', {
+            player: {
+                uniqueId: p.uniqueId,
+                nickname: chosen.name,
+                avatar: chosen.avatar,
+                rank: chosen.rank,
+                level: chosen.newLvl
+            },
+            oldLevel: chosen.oldLvl,
+            newLevel: chosen.newLvl,
+            oldRank: chosen.rank,
+            newRank: chosen.rank,
+            isLevelUp: true,
+            isRankUp: false,
+            quote: chosen.quote
+        });
+        console.log(`✨ Mock Level Up emitted for ${chosen.name}: Lv.${chosen.oldLvl} -> Lv.${chosen.newLvl}`);
     });
 
     socket.on('admin_connect_tiktok', (username) => {

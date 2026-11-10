@@ -171,6 +171,15 @@ const dungeonTimerClock = document.getElementById('dungeon-timer-clock');
 const defeatBanner = document.getElementById('defeat-banner');
 const defeatRetryText = document.getElementById('defeat-retry-text');
 
+// Elements cho bảng Vinh Danh Thợ Săn Lên Cấp
+const levelUpModal = document.getElementById('level-up-modal');
+const lvlAvatarImg = document.getElementById('lvl-avatar-img');
+const lvlBadgeRank = document.getElementById('lvl-badge-rank');
+const lvlHunterName = document.getElementById('lvl-hunter-name');
+const lvlFromNum = document.getElementById('lvl-from-num');
+const lvlToNum = document.getElementById('lvl-to-num');
+const lvlQuote = document.getElementById('lvl-quote');
+
 function formatSeconds(sec) {
     const s = Math.max(0, Math.floor(sec || 0));
     const m = Math.floor(s / 60);
@@ -342,6 +351,64 @@ function showNextToast() {
         t.style.transform = 'scale(0.8)';
         setTimeout(() => t.remove(), 200);
         setTimeout(showNextToast, 350);
+    }, 2800);
+}
+
+// ==========================================
+// HỆ THỐNG VINH DANH THỢ SĂN LÊN CẤP (LEVEL UP CEREMONY)
+// ==========================================
+const levelUpQueue = [];
+let isLevelUpShowing = false;
+
+function enqueueLevelUp(data) {
+    levelUpQueue.push(data);
+    if (!isLevelUpShowing) {
+        showNextLevelUp();
+    }
+}
+
+function showNextLevelUp() {
+    if (levelUpQueue.length === 0) {
+        isLevelUpShowing = false;
+        return;
+    }
+    isLevelUpShowing = true;
+    const item = levelUpQueue.shift();
+
+    if (!levelUpModal) {
+        isLevelUpShowing = false;
+        return;
+    }
+
+    if (lvlAvatarImg) lvlAvatarImg.src = item.player.avatar;
+    if (lvlBadgeRank) lvlBadgeRank.innerText = `HẠNG ${item.newRank}`;
+    if (lvlHunterName) lvlHunterName.innerText = `@${item.player.nickname}`;
+    if (lvlFromNum) lvlFromNum.innerText = `Lv.${item.oldLevel}`;
+    if (lvlToNum) lvlToNum.innerText = `Lv.${item.newLevel}`;
+    if (lvlQuote) {
+        lvlQuote.innerText = item.quote || (item.isRankUp ? `👑 THĂNG HẠNG VƯỢT BẬC: HẠNG ${item.newRank}!` : '✨ Sức mạnh ma lực được khai mở vượt bậc!');
+    }
+
+    // Âm thanh vinh danh thăng cấp
+    const isHighRank = (item.newRank === 'QUỐC GIA' || item.newRank === 'S' || item.isRankUp);
+    playSound(isHighRank ? 'rank_up' : 'level_up');
+
+    // Hiệu ứng aura trên hàng ngũ thợ săn
+    const soldierEl = document.getElementById(`hunter_${item.player.uniqueId}`);
+    if (soldierEl) {
+        soldierEl.classList.add('soldier-levelup');
+        setTimeout(() => soldierEl.classList.remove('soldier-levelup'), 2600);
+    }
+
+    levelUpModal.classList.remove('hidden', 'closing');
+
+    setTimeout(() => {
+        levelUpModal.classList.add('closing');
+        setTimeout(() => {
+            levelUpModal.classList.add('hidden');
+            levelUpModal.classList.remove('closing');
+            setTimeout(showNextLevelUp, 350);
+        }, 350);
     }, 2800);
 }
 
@@ -580,12 +647,6 @@ socket.on('boss_damaged', (data) => {
     updateHpBar(data.bossCurrentHp, data.bossMaxHp);
     flashBossHit();
 
-    // Âm thanh LÊN CẤP / THĂNG HẠNG THỢ SĂN (Level Up / Rank Up)
-    if (data.isRankUp) {
-        const isGodOrS = (data.player.rank === 'QUỐC GIA' || data.player.rank === 'S');
-        playSound(isGodOrS ? 'rank_up' : 'level_up');
-    }
-
     let type = 'normal';
     if (data.actionType === 'gift') {
         type = (data.giftName && data.giftName.includes('Hạc')) ? 'arise' : 'crit';
@@ -603,6 +664,11 @@ socket.on('boss_damaged', (data) => {
 
 socket.on('leaderboard_updated', (data) => {
     renderLeaderboards(data.topDps, data.topDonators);
+});
+
+// Sự kiện Vinh Danh Thợ Săn Lên Cấp / Thăng Hạng
+socket.on('hunter_level_up', (data) => {
+    enqueueLevelUp(data);
 });
 
 // Sự kiện ARISE (TRỖI DẬY) 99+ xu
