@@ -681,7 +681,7 @@ async function connectToTikTok(username) {
     }
 
     try {
-        const { TikTokLiveClient, EventType, isStreakOver } = require('piratetok-live-js');
+        const { TikTokLiveClient, EventType, isStreakOver } = await import('piratetok-live-js');
         currentTikTokUsername = username;
 
         pirateClient = new TikTokLiveClient(username);
@@ -799,10 +799,17 @@ async function connectToTikTok(username) {
 
         await pirateClient.connect();
     } catch (err) {
+        console.error('Lỗi kết nối TikTok:', err);
         isTikTokConnected = false;
+        let errMsg = err.message || 'Không thể kết nối tới TikTok';
+        if (err.name === 'HostNotOnlineError' || errMsg.toLowerCase().includes('not online')) {
+            errMsg = `Tài khoản @${username} hiện chưa bật Live stream trên TikTok!`;
+        } else if (err.name === 'UserNotFoundError' || errMsg.toLowerCase().includes('does not exist')) {
+            errMsg = `Không tìm thấy tài khoản TikTok @${username}!`;
+        }
         io.emit('tiktok_status', {
             connected: false,
-            error: err.message || 'Không thể kết nối tới TikTok'
+            error: errMsg
         });
     }
 }
