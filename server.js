@@ -680,33 +680,23 @@ async function connectToTikTok(username) {
         pirateClient = null;
     }
 
+    currentTikTokUsername = username;
+    console.log(`📡 Đang bắt đầu kết nối trực tiếp phòng Live của @${username}...`);
+
     try {
         const { TikTokLiveClient, EventType, isStreakOver } = await import('piratetok-live-js');
-        currentTikTokUsername = username;
+        const client = new TikTokLiveClient(username);
+        pirateClient = client;
 
-        pirateClient = new TikTokLiveClient(username);
-
-        pirateClient.on(EventType.CONNECTED, (state) => {
-            isTikTokConnected = true;
-            io.emit('tiktok_status', {
-                connected: true,
-                username: currentTikTokUsername,
-                roomId: state?.roomId || null
-            });
-        });
-
-        pirateClient.on(EventType.DISCONNECTED, () => {
-            isTikTokConnected = false;
-            io.emit('tiktok_status', { connected: false, error: 'Đã ngắt kết nối' });
-        });
-
-        // 1. Sự kiện Thả Tim (Chạm màn hình ➔ Đánh thường)
-        pirateClient.on(EventType.LIKE, (data) => {
+        // 1. Sự kiện Thả Tim (Like)
+        client.on(EventType.like, (data) => {
             try {
                 const uid = data.user?.uniqueId || 'viewer_' + Date.now();
                 const name = data.user?.nickname || data.user?.uniqueId || 'Thợ Săn Ẩn Danh';
-                const avatar = data.user?.profilePictureUrl || DEFAULT_AVATARS[0];
-                const likeCount = Math.max(1, data.likeCount || 1);
+                const avatar = data.user?.profilePictureUrl || 
+                               data.user?.avatarThumb?.urlList?.[0] || 
+                               DEFAULT_AVATARS[0];
+                const likeCount = Math.max(1, Number(data.count) || Number(data.likeCount) || 1);
 
                 const player = getOrCreatePlayer(uid, name, avatar);
                 const damagePerLike = 5 + Math.floor(player.level * 1.5);
@@ -716,13 +706,15 @@ async function connectToTikTok(username) {
             }
         });
 
-        // 2. Sự kiện Chat (Gõ phím ➔ Kỹ năng)
-        pirateClient.on(EventType.CHAT, (data) => {
+        // 2. Sự kiện Chat (Comment)
+        client.on(EventType.chat, (data) => {
             try {
                 const uid = data.user?.uniqueId || 'chat_' + Date.now();
                 const name = data.user?.nickname || data.user?.uniqueId || 'Thợ Săn';
-                const avatar = data.user?.profilePictureUrl || DEFAULT_AVATARS[0];
-                const comment = (data.comment || '').trim();
+                const avatar = data.user?.profilePictureUrl || 
+                               data.user?.avatarThumb?.urlList?.[0] || 
+                               DEFAULT_AVATARS[0];
+                const comment = (data.content || data.comment || '').trim();
 
                 const player = getOrCreatePlayer(uid, name, avatar);
                 const damage = 25 + player.level * 2;
@@ -739,22 +731,28 @@ async function connectToTikTok(username) {
             }
         });
 
-        // 3. Sự kiện Tặng Quà Donate
-        pirateClient.on(EventType.GIFT, (data) => {
+        // 3. Sự kiện Tặng Quà Donate (Gift)
+        client.on(EventType.gift, (data) => {
             try {
+                if (typeof isStreakOver === 'function' && !isStreakOver(data)) {
+                    return;
+                }
+
                 const uid = data.user?.uniqueId || 'donator_' + Date.now();
                 const name = data.user?.nickname || data.user?.uniqueId || 'Đại Gia';
-                const avatar = data.user?.profilePictureUrl || DEFAULT_AVATARS[0];
+                const avatar = data.user?.profilePictureUrl || 
+                               data.user?.avatarThumb?.urlList?.[0] || 
+                               DEFAULT_AVATARS[0];
 
-                const giftName = data.giftDetails?.giftName || data.giftName || 'Quà TikTok';
-                const diamonds = data.giftDetails?.diamondCount || data.diamonds || 1;
-                const repeatCount = data.repeatCount || data.comboCount || 1;
+                const giftName = data.gift?.name || data.gift?.describe || data.giftDetails?.giftName || data.giftName || 'Quà TikTok';
+                const diamonds = Number(data.gift?.diamondCount) || Number(data.giftDetails?.diamondCount) || Number(data.diamonds) || 1;
+                const repeatCount = Number(data.repeatCount) || Number(data.comboCount) || 1;
                 const totalDiamonds = diamonds * repeatCount;
 
                 const player = getOrCreatePlayer(uid, name, avatar);
                 player.totalDiamonds += totalDiamonds;
 
-                let icon = '/assets/icons/tiktok_rose.png';
+                let icon = data.gift?.image?.urlList?.[0] || '/assets/icons/tiktok_rose.png';
                 if (diamonds >= 99) icon = '/assets/icons/tiktok_paper_crane.png';
                 else if (diamonds >= 20) icon = '/assets/icons/tiktok_perfume.png';
                 else if (diamonds >= 10) icon = '/assets/icons/tiktok_rosa.png';
@@ -797,9 +795,31 @@ async function connectToTikTok(username) {
             }
         });
 
-        await pirateClient.connect();
+        // 4. Ngắt kết nối & Kết thúc Live
+        client.on(EventType.disconnected, () => {
+            isTikTokConnected = false;
+            console.log(`⚠️ Phòng Live @${username} đã ngắt kết nối`);
+            io.emit('tiktok_status', { connected: false, error: 'Phòng Live đã ngắt kết nối', username });
+        });
+
+        client.on(EventType.liveEnded, () => {
+            isTikTokConnected = false;
+            console.log(`🛑 Phiên Live @${username} đã kết thúc`);
+            io.emit('tiktok_status', { connected: false, error: 'Phiên Live đã kết thúc', username });
+        });
+
+        // Kết nối WebSocket trực tiếp
+        const roomId = await client.connect();
+        isTikTokConnected = true;
+        console.log(`✅ [Trực Tiếp] ĐÃ KẾT NỐI THÀNH CÔNG phòng Live: @${username} (Room ID: ${roomId})`);
+        io.emit('tiktok_status', {
+            connected: true,
+            username: currentTikTokUsername,
+            roomId: String(roomId || '')
+        });
+
     } catch (err) {
-        console.error('Lỗi kết nối TikTok:', err);
+        console.error(`❌ Lỗi kết nối TikTok Live @${username}:`, err.message);
         isTikTokConnected = false;
         let errMsg = err.message || 'Không thể kết nối tới TikTok';
         if (err.name === 'HostNotOnlineError' || errMsg.toLowerCase().includes('not online')) {
@@ -809,7 +829,8 @@ async function connectToTikTok(username) {
         }
         io.emit('tiktok_status', {
             connected: false,
-            error: errMsg
+            error: errMsg,
+            username
         });
     }
 }
