@@ -15,6 +15,7 @@
                     var vp = document.getElementById('game-viewport');
                     if (!vp) return;
                     var s = Math.min(window.innerWidth / 430, window.innerHeight / 764);
+                    vp.style.setProperty('--game-scale', s);
                     vp.style.transform = 'scale(' + s + ')';
                 }
                 fit();
